@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head>
+	<meta name="generator" content="Hugo 0.93.2" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your site description">
+    
+    <link rel="shortcut icon" href="https://srs.fyi/favicon/favicon.ico">
+    <link rel="alternate" type="application/rss+xml" href="https://srs.fyi/index.xml" title="srs.fyi">
+    <script type="text/javascript" src="greet.js"></script>
+       <script>
+         const greetings = ["Hi!", "ようこそ!", "Hallo!", "歡迎!"];
+         window.addEventListener('load', function() {
+           const greetElem = document.getElementById("splash-hello-text");
+           const caretElem = document.getElementById("splash-hello-caret");
+           const greeter = newGreeter(greetElem, caretElem, greetings, false);
+           greet = function () { greeter.nextGreet(); }
+           setTimeout(greet, greeter.shortTimeout);
+         });
+       </script>
+       <style>
+         .blink {
+           animation-name: blinker;
+           animation-duration: 1.5s;
+           animation-timing-function: step-start;
+           animation-iteration-count: 10;
+           animation-fill-mode: backwards;
+         }
+         @keyframes blinker {
+           50% {
+             opacity: 0;
+           }
+         }
+       </style>
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title></title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://srs.fyi">srs.fyi</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="/about/" title="about">about</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+        <b><span id="splash-hello-text">Hi!</span></b><span id="splash-hello-caret" class="blink" style="vertical-align: top">|</span>
+<p>I&rsquo;m Stephen, and I help secure blockchain systems.</p>
+<p>In my spare time, I maintain this blog.
+Thanks for stopping by!</p>
+<h3>Posts</h3>
+<ul id="posts">
+    <li>
+    <a href="https://srs.fyi/directed-steps/">
+        Directed Steps
+        <small><time>Apr 6, 2022</time></small>
+    </a>
+</li>
+
+</ul>
+
+        </main><footer id="footer">
+    Copyright © 2022 Stephen Skeirik
+</footer>
+</body>
+</html>
