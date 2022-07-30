@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your site description">
+    
+    <link rel="shortcut icon" href="https://srs.fyi/favicon/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Learning Haskell</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://srs.fyi">srs.fyi</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="/about/" title="about">about</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Learning Haskell</h1>
+        <div>
+                <time>July 30, 2022</time>
+            </div>
+    </header><p><strong>TLDR:</strong> In this blog post, I list some of the challenges that I faced while learning Haskell.
+Skip down to <strong>Challenges</strong> to see my list.</p>
+<p>My journey to Haskell dates back to the start of my university days.
+I first heard about Haskell from an older grad student I worked with.
+He was an opinionated man with an impressively long beard who rolled his own cigarettes and often took smoke breaks just outside the department building.
+Haskell was a challenging and mind-bending language, he promised, as a puff of smoke wafted into the air.</p>
+<p>As a budding, wide-eyed computer science major, I couldn&rsquo;t help but be curious.
+And sure enough, Haskell was <em>different</em> from any language I had ever used (which up to that point, was mostly Java).
+Despite my best efforts to learn it, I quickly found myself stuck.</p>
+<p>Over the years, I occasionally would run across a new blogpost claiming to explain monads (or GADTs or type classes or, well, you get the idea) and decide to give Haskell another shot.
+Invariably, I would stumble over some tricky bit of code and retreat.
+But for whatever reason, I wasn&rsquo;t willing to throw in the towel (whether it was curiosity, pride, or stubbornness, I can&rsquo;t be sure).</p>
+<p>In the past few weeks, I found my way back to Haskell again by way of a discussion with work colleagues.
+A smattering of further insightful conversations, cryptic GHCi sessions, and nightly reading stints followed.
+Now, after a decade and a half of false starts, snagging a PhD in the meantime, I <em>finally</em> feel that I am beginning to understand Haskell<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+<p>In this blog post, I want to:</p>
+<ol>
+<li>reflect on some of the challenges that I faced on my learning journey;</li>
+<li>document what resources/methods I found helpful, if any;</li>
+<li>present these thoughts to others who might be learning or teaching Haskell.</li>
+</ol>
+<h1 id="challenges">Challenges</h1>
+<ul>
+<li><a href="#mindset">Mindset</a></li>
+<li><a href="#functors-applicatives-and-monads-oh-my">Functors, Applicatives, and Monads&hellip; Oh My!</a></li>
+<li><a href="#terseness">Terseness</a></li>
+<li><a href="#show-me">Show Me</a></li>
+<li><a href="#parallel-worlds">Parallel Worlds</a>
+<ul>
+<li><a href="#even-more-parallel-worlds">Even More Parallel Worlds</a></li>
+</ul>
+</li>
+<li><a href="#higher-kinded-types">Higher-Kinded Types</a>
+<ul>
+<li><a href="#partially-applied-hkts-in-type-class-instances">Partially Applied HKTs in Type Class Instances</a></li>
+</ul>
+</li>
+<li><a href="#extensive-extensions">Extensive Extensions</a></li>
+<li><a href="#build-tools">Build Tools</a></li>
+</ul>
+<h2 id="mindset">Mindset</h2>
+<p>While mindset is clearly subjective (and may evoke images of fake gurus shilling poorly-conceived get-rick-quick courses), I do think this idea is worth recalling briefly.
+In my early experience from reading blogposts and talking to others, Haskell was always shrouded in a certain sense of mystery, revered as a powerful language beyond the reach of mortal programmers (or at least, as a hard-to-learn language).
+Both the abstraction and terseness issues that I mention below seem to contribute to this reputation.</p>
+<p>Of course, in actuality, Haskell is a tool for programming with its own quirks and benefits, just like any other language.</p>
+<p>But, by adopting the former mindset instead of the latter, I became intimidated and more likely to give up.</p>
+<p><em>Recommendation</em>:
+Keep things in perspective.</p>
+<ol>
+<li>For programmers who started with an imperative background (like me), Haskell will be different and probably challenging to learn.</li>
+<li>At the same time, it&rsquo;s just a programming language with a different computational model than imperative languages; it is not magic or beyond the reach of normal programmers.</li>
+</ol>
+<h2 id="functors-applicatives-and-monads-oh-my">Functors, Applicatives, and Monads&hellip; Oh My!</h2>
+<p>Haskell has its theoretical roots in type theory, which has close connections to category theory, with many concepts also imported from abstract algebra.
+This theoretical legacy shines through strongly in the interface design in Haskell type class hierarchy.
+In my opinion, much of the mystery surrounding Haskell stems from these interfaces.
+When the average person sees the words functor, semigroup, monoid, or monad, they probably feel either mystified or intimidated.
+I know I felt both when I first started my Haskell journey.</p>
+<p><em>Recommendation</em>:
+This is a tough one.
+On the one hand, I think all of above algebraic/categorical structures are really useful and good abstractions!
+On the other hand, learning all of them, even intuitively, is a fair amount of work.
+There are a couple things to do if this feels overwhelming:</p>
+<ol>
+<li>find a good resource that takes you through the concepts step-by-step;</li>
+<li>forget about all of the mathematical/historical baggage and learn the type classes just as black box interfaces that satisfy certain rules;</li>
+<li>avoid wikis and other reference sites; their use of technical language and lack of linear structure can trip up beginners.</li>
+</ol>
+<p>As for general resources, I think you can&rsquo;t go wrong with the incredibly gentle and thorough <a href="https://haskellbook.com/"><em>Haskell Programming from First Principles</em></a>;
+just be aware that it is a hefty tome weighing in at about 1200 pages!</p>
+<h2 id="terseness">Terseness</h2>
+<p>I argue that Haskell is a terse language in two senses:</p>
+<ol>
+<li><em>syntactically</em>, i.e., concepts can be expressed with a minimum of syntactic ceremony<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>; and</li>
+<li><em>semantically</em>, i.e., certain omitted details can be automatically inferred by the compiler.</li>
+</ol>
+<p>Together, these imply you can express powerful concepts with a small amount of code.
+The challenge is also two-fold:</p>
+<ol>
+<li><em>syntactically</em> terse languages provide less syntactic pointers that describe the meaning of the code;</li>
+<li><em>semantically</em> terse languages may require the programmer to <em>explicitly</em> reconstruct details that are only <em>implicitly</em> described in the code.</li>
+</ol>
+<p>Both of these items <em>empower</em> experts who are already fluent in a language but can <em>impede</em> beginners who wish to learn it (though not always).</p>
+<p><em>Recommendation</em>:
+There are two main recommendations here:</p>
+<ol>
+<li>
+<p>Use text editors with syntax highlighting to alleviate potential syntactic confusion;</p>
+</li>
+<li>
+<p>Learn and lean on interactive debugging tools like GHCi whenever possible that can:</p>
+<ul>
+<li>show all reconstructed details that were omitted from the codebase;</li>
+<li>step through the process taken to arrive at some conclusion.</li>
+</ul>
+</li>
+</ol>
+<h2 id="show-me">Show Me</h2>
+<p>As a beginner, when you open up GHCi and try to get help for some common function, say <code>foldl</code>, you may naturally type:</p>
+<pre tabindex="0"><code>ghci&gt; foldl  
+error:  
+• No instance for (Show ((b0 -&gt; a0 -&gt; b0) -&gt; b0 -&gt; [a0] -&gt; b0)) arising from a use of ‘print’  
+• In a stmt of an interactive GHCi command: print it
+</code></pre><p>Unfortunately, this error message is not very helpful for a beginner.</p>
+<p><em>Recommendation</em>:
+Use the GHCi <code>:type</code> or <code>:info</code> commands.
+I am a bit surprised the interpreter does not directly provide this hint;  it would save all beginners at least one internet search.</p>
+<h2 id="parallel-worlds">Parallel Worlds</h2>
+<p>There are two totally separate, almost parallel worlds in Haskell: the world of terms and the world of types.
+However, sometimes there are parallel entities which exist in <em>both</em> worlds which have the <em>same</em> name.
+As an example, consider this definition:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--   -----   -----</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--   Type    Term</span>
+</span></span></code></pre></div><p>On the left hand side of the equals sign, we are defining a type constructor <code>Bar</code> parameterized over a type variable <code>a</code>.
+Conversely, on the right hand side of the equals sign, we are defining a term constructor <code>Bar</code> parameterized over a term variable <code>a</code>.
+This means we can write things like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="cm">{- Types -}</span> <span class="n">intBar</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Bar</span> <span class="kt">Int</span>
+</span></span><span class="line"><span class="cl"><span class="cm">{- Terms -}</span> <span class="n">intBar</span> <span class="n">x</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">x</span>
+</span></span></code></pre></div><p>Experienced Haskellers know that:</p>
+<ol>
+<li>the first line is a type signature and makes a statement about the world of types;</li>
+<li>the second line is a function definition and makes a statement about the world of terms (though type names can still creep if types cannot be inferred).</li>
+</ol>
+<p>Thus, experienced Haskellers know that <code>Bar Int</code> in the first line must refer to a type constructor and <code>Bar x</code> on second line refers to a term constructor.
+However, for a beginner, this overlap can be confusing.</p>
+<p><em>Recommendation</em>:
+N/A</p>
+<h3 id="even-more-parallel-worlds">Even More Parallel Worlds</h3>
+<p>You might think that two parallel meanings of a word was enough&hellip; but Haskell doesn&rsquo;t mess around.
+For extra credit, we can enable the <code>-XDataKinds</code> extension.
+With this extension, the compiler generates a third parallel world of <em>kinds</em> which can be used in type-level programming.</p>
+<p>With <code>-XDataKinds</code> enabled, upon seeing a data declaration, (in most cases) the compiler will implicitly generate a new kind with new types to inhabit it.
+In the book <a href="https://thinkingwithtypes.com"><em>Thinking With Types</em></a>, the author Sandy Maguire invents a kind declaration notation to describe the way this is done.
+As an example, recall the <code>Bar</code> declaration above.
+When the compiler sees this type declaration:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--   -----   -----</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--   Type    Term</span>
+</span></span></code></pre></div><p>It will implicitly generate a kind declaration (not valid Haskell syntax):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="nf">kind</span> <span class="kt">Bar</span> <span class="n">a</span>  <span class="ow">=</span>  <span class="kt">&#39;Bar</span> <span class="n">a</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--   -----     ------</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--   Kind       Type   -- world</span>
+</span></span><span class="line"><span class="cl"><span class="c1">--  (Type)     (Term)  -- world promoted from</span>
+</span></span></code></pre></div><p>where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.</p>
+<p>Thus, in our final tally, <code>Bar</code> (possibly with a leading single quote) now has four possible usages:</p>
+<ol>
+<li><code>Bar</code> - a term constructor</li>
+<li><code>Bar</code> - a type constructor</li>
+<li><code>'Bar</code> - a type constructor (i.e. a promoted term constructor)</li>
+<li><code>Bar</code> - a kind (i.e. a promoted type constructor)</li>
+</ol>
+<p>Fortunately, the <code>-XDataKinds</code> extension is only needed for type-level programming.
+Most of the time, Haskellers can safely ignore this.</p>
+<p><em>Recommendation</em>:
+Be aware of the <code>-XDataKinds</code> extension and its associated syntax.
+That way, when you see this syntax in other code, you will won&rsquo;t be confused (it&rsquo;s hard to search for syntax online!).
+If you want to dive deeper into this subject, I can recommend Sandy&rsquo;s book <a href="https://thinkingwithtypes.com"><em>Thinking With Types</em></a>.</p>
+<h2 id="higher-kinded-types">Higher-Kinded Types</h2>
+<p>Higher-kinded types (HKTs) offer a lot of power, i.e., type constructors which take types as arguments.
+If you are unfamiliar with this concept, think of types like:</p>
+<ul>
+<li>
+<p><code>[] :: Type -&gt; Type</code><br>
+Comment: takes type <code>a</code> to lists of type <code>a</code><br>
+Example: <code>[String]</code> - type of lists of strings</p>
+</li>
+<li>
+<p><code>Maybe :: Type -&gt; Type</code><br>
+Comment: takes type <code>a</code> to optional <code>a</code><br>
+Example: <code>Maybe Int</code> - type of optional integers</p>
+</li>
+<li>
+<p><code>(-&gt;) :: Type -&gt; Type -&gt; Type</code><br>
+Comment: takes types <code>a</code> and <code>b</code> to functions from <code>a</code> to <code>b</code><br>
+Example: <code>Int -&gt; Bool</code> - type of functions from <code>Int</code> to <code>Bool</code></p>
+</li>
+</ul>
+<p>These are only first-order higher-kinded types.
+We also have examples of second-order types.
+Most commonly, these are types defined implicitly by type classes.
+Examples include<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>:</p>
+<ul>
+<li><code>Functor :: (Type -&gt; Type) -&gt; Type</code></li>
+<li><code>Monad :: (Type -&gt; Type) -&gt; Type</code></li>
+</ul>
+<p>The fact that types not only act as functions at the type level&mdash;but as higher-order functions&mdash;was challenging.
+As we&rsquo;ll see in the next section, partial application of HKTs takes the challenge up a notch.</p>
+<p><em>Recommendation</em>:
+Learn about higher-order functions (you&rsquo;ll want to do this anyway).
+Make a mental note that types in Haskell are functions at the type-level.</p>
+<h3 id="partially-applied-hkts-in-type-class-instances">Partially Applied HKTs in Type Class Instances</h3>
+<p>Oftentimes, we want to create a type class instance for a type whose kind doesn&rsquo;t quite match the type class.
+As an example, recall the arrow type <code>(-&gt;)</code> which takes two type arguments.
+We would like to apply the <code>Functor</code> type constructor to arrow type, but we cannot, because the kind signatures don&rsquo;t match up.
+<code>Functor</code> needs an argument of kind <code>Type -&gt; Type</code>, but <code>(-&gt;)</code> has kind <code>Type -&gt; Type -&gt; Type</code>.
+To solve this problem, we can <em>partially apply</em> type constructors.</p>
+<p>Many examples of partial application of HKTs occur in the type class hierarchy including:</p>
+<ol>
+<li>
+<p>The <code>Functor</code> instance for arrow types: <code>instance Functor ((-&gt;) r)</code>.
+Here we partially applied the arrow constructor with only one type.</p>
+</li>
+<li>
+<p>The <code>Monad</code> instance for <code>StateT</code> used by the type synonym <code>State</code>: <code>instance Monad m =&gt; Monad (StateT s m)</code>.
+Here we partially applied the <code>StateT</code> contructor with two types.</p>
+</li>
+</ol>
+<p>The trickiness of partially applied HKTs in type instances is that:</p>
+<ul>
+<li>the HKT argument in the type instance definition is partially applied but;</li>
+<li>the missing type(s) are specified in the type class definition.</li>
+</ul>
+<p>A naive Haskeller may not even realize that they are working with a partially applied HKT.
+This partial application is only apparent if one has previously seen the type constructor or type class definition in question.</p>
+<p><em>Recommendation</em>:
+Learn about currying (you&rsquo;ll want to do this anyway).
+Amend the mental note you just made to state that type constructors in Haskell are actually <em>curried</em> functions at the type-level and can be partially applied.</p>
+<h2 id="extensive-extensions">Extensive Extensions</h2>
+<p>All popular programming languages evolve into new versions over time.
+When this happens, a developer has to choose if and how to do version migration.
+However, for some languages (like Haskell), the choice is more nuanced.</p>
+<p>In addition to versions, Haskell has a sizeable collection of extensions, i.e., language-level features that can radically change the meaning of programs.
+These extensions can add, remove, or reinterpret existing syntactic constructs and even modify core compiler behaviors.</p>
+<p>This leads to several issues:</p>
+<ol>
+<li>The proliferation of extensions can lead to confusion about what syntax is accepted and what code compiles in what context.</li>
+<li>Each extension must be learned additionally on top of the core Haskell specification and standard library.
+For a language as complex as Haskell, that&rsquo;s a big ask.</li>
+</ol>
+<p>Fortunately, there have been efforts to curb or mitigate the extension explosion.
+Newer versions of GHC (the Haskell compiler) enable popular extensions by default (a way of standardizing the extension set) and often emit warnings when code requires a specific extension.</p>
+<p><em>Recommendation</em>:
+Don&rsquo;t try to learn all of the extensions; it&rsquo;s tons of work and many of them are deprecated.
+Do consult the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/exts.html">official extension list</a> in the GHC user guide when needed.</p>
+<h2 id="build-tools">Build Tools</h2>
+<p>Build tools (and package formats) are all about gathering dependencies and build recipes for your code so that someone else can build it on their machine without your help.
+Currently, the Haskell community is currently split between two seemingly good similar-but-different build tools: Cabal (2004) and Stack (2015).</p>
+<p>When I first started learning Haskell, Cabal was the only option available (though at that time I never needed it).
+Later in my Haskell journey, I discovered Stack, which I used almost exclusively since then.
+While I find Stack generally works well, I also find it to be complex.</p>
+<p>Unlike Python pip or the Node package manager, Stack seems to discourage interactive installation of packages.
+Instead, users are directed to edit their <code>stack.yaml</code> and let Stack install packaged dependencies and build the project as necessary.
+When I first started, I was somewhat confused because the experience was different from what I had used previously.</p>
+<p>So, the trade-off seems to be: a more complex setup process in exchange for a more documented and reproducible build.</p>
+<p><em>Recommendation</em>:
+Pick a build tool between the two options and stick with it.
+Carefully read the <a href="https://docs.haskellstack.org/en/stable/README/">Stack</a> or <a href="https://cabal.readthedocs.io/en/stable/">Cabal</a> user guide.</p>
+<h1 id="wrapping-up">Wrapping Up</h1>
+<p>If you&rsquo;ve made it this far, thanks for following along!</p>
+<p>If you&rsquo;re a newcomer to Haskell, I hope you learned something from this post.</p>
+<p>Haskell is an ambitious and fun language that allows you to write compact, fast, and safe code in a functional style.
+Partially due to these demanding goals, Haskell has <em>a lot</em> of moving parts.
+Mastering it takes time.</p>
+<p>In parting, let me close with one last tip.</p>
+<p><em>Recommendation</em>:
+Use the right tool for the right job.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>I guess the old adage that you need a PhD to learn Haskell turned out to be true&hellip; at least in my case.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>The fact that a language has a terse syntax does not imply that it has a simple syntax.
+Clearly, Haskell has fairly complex syntax with its rules about indentation and bracketing and a plethora of extensions that give you the ability to write the same program in many different ways (e.g. ADT vs GADT syntax, guards/where clauses vs. if/pattern match, etc).
+Arguably, array-like languages like APL represent the extreme of terse and simple syntaxes.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>Technically, the constructors which are implicitly defined for type classes inhabit the <code>Constraint</code> kind instead of the <code>Type</code> kind&mdash;but that is more of an implementation detail.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+</article>
+
+        </main><footer id="footer">
+    Copyright © 2022 Stephen Skeirik
+</footer>
+</body>
+</html>

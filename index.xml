@@ -6,9 +6,293 @@
     <description>Recent content on srs.fyi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Wed, 06 Apr 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 30 Jul 2022 11:17:00 -0400</lastBuildDate>
     
 	<atom:link href="https://srs.fyi/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Learning Haskell</title>
+      <link>https://srs.fyi/learning-haskell/</link>
+      <pubDate>Sat, 30 Jul 2022 11:17:00 -0400</pubDate>
+      
+      <guid>https://srs.fyi/learning-haskell/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;TLDR:&lt;/strong&gt; In this blog post, I list some of the challenges that I faced while learning Haskell.
+Skip down to &lt;strong&gt;Challenges&lt;/strong&gt; to see my list.&lt;/p&gt;
+&lt;p&gt;My journey to Haskell dates back to the start of my university days.
+I first heard about Haskell from an older grad student I worked with.
+He was an opinionated man with an impressively long beard who rolled his own cigarettes and often took smoke breaks just outside the department building.
+Haskell was a challenging and mind-bending language, he promised, as a puff of smoke wafted into the air.&lt;/p&gt;
+&lt;p&gt;As a budding, wide-eyed computer science major, I couldn&amp;rsquo;t help but be curious.
+And sure enough, Haskell was &lt;em&gt;different&lt;/em&gt; from any language I had ever used (which up to that point, was mostly Java).
+Despite my best efforts to learn it, I quickly found myself stuck.&lt;/p&gt;
+&lt;p&gt;Over the years, I occasionally would run across a new blogpost claiming to explain monads (or GADTs or type classes or, well, you get the idea) and decide to give Haskell another shot.
+Invariably, I would stumble over some tricky bit of code and retreat.
+But for whatever reason, I wasn&amp;rsquo;t willing to throw in the towel (whether it was curiosity, pride, or stubbornness, I can&amp;rsquo;t be sure).&lt;/p&gt;
+&lt;p&gt;In the past few weeks, I found my way back to Haskell again by way of a discussion with work colleagues.
+A smattering of further insightful conversations, cryptic GHCi sessions, and nightly reading stints followed.
+Now, after a decade and a half of false starts, snagging a PhD in the meantime, I &lt;em&gt;finally&lt;/em&gt; feel that I am beginning to understand Haskell&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;In this blog post, I want to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;reflect on some of the challenges that I faced on my learning journey;&lt;/li&gt;
+&lt;li&gt;document what resources/methods I found helpful, if any;&lt;/li&gt;
+&lt;li&gt;present these thoughts to others who might be learning or teaching Haskell.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;challenges&#34;&gt;Challenges&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#mindset&#34;&gt;Mindset&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#functors-applicatives-and-monads-oh-my&#34;&gt;Functors, Applicatives, and Monads&amp;hellip; Oh My!&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#terseness&#34;&gt;Terseness&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#show-me&#34;&gt;Show Me&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#parallel-worlds&#34;&gt;Parallel Worlds&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#even-more-parallel-worlds&#34;&gt;Even More Parallel Worlds&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#higher-kinded-types&#34;&gt;Higher-Kinded Types&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#partially-applied-hkts-in-type-class-instances&#34;&gt;Partially Applied HKTs in Type Class Instances&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#extensive-extensions&#34;&gt;Extensive Extensions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#build-tools&#34;&gt;Build Tools&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;mindset&#34;&gt;Mindset&lt;/h2&gt;
+&lt;p&gt;While mindset is clearly subjective (and may evoke images of fake gurus shilling poorly-conceived get-rick-quick courses), I do think this idea is worth recalling briefly.
+In my early experience from reading blogposts and talking to others, Haskell was always shrouded in a certain sense of mystery, revered as a powerful language beyond the reach of mortal programmers (or at least, as a hard-to-learn language).
+Both the abstraction and terseness issues that I mention below seem to contribute to this reputation.&lt;/p&gt;
+&lt;p&gt;Of course, in actuality, Haskell is a tool for programming with its own quirks and benefits, just like any other language.&lt;/p&gt;
+&lt;p&gt;But, by adopting the former mindset instead of the latter, I became intimidated and more likely to give up.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Keep things in perspective.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;For programmers who started with an imperative background (like me), Haskell will be different and probably challenging to learn.&lt;/li&gt;
+&lt;li&gt;At the same time, it&amp;rsquo;s just a programming language with a different computational model than imperative languages; it is not magic or beyond the reach of normal programmers.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;functors-applicatives-and-monads-oh-my&#34;&gt;Functors, Applicatives, and Monads&amp;hellip; Oh My!&lt;/h2&gt;
+&lt;p&gt;Haskell has its theoretical roots in type theory, which has close connections to category theory, with many concepts also imported from abstract algebra.
+This theoretical legacy shines through strongly in the interface design in Haskell type class hierarchy.
+In my opinion, much of the mystery surrounding Haskell stems from these interfaces.
+When the average person sees the words functor, semigroup, monoid, or monad, they probably feel either mystified or intimidated.
+I know I felt both when I first started my Haskell journey.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+This is a tough one.
+On the one hand, I think all of above algebraic/categorical structures are really useful and good abstractions!
+On the other hand, learning all of them, even intuitively, is a fair amount of work.
+There are a couple things to do if this feels overwhelming:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;find a good resource that takes you through the concepts step-by-step;&lt;/li&gt;
+&lt;li&gt;forget about all of the mathematical/historical baggage and learn the type classes just as black box interfaces that satisfy certain rules;&lt;/li&gt;
+&lt;li&gt;avoid wikis and other reference sites; their use of technical language and lack of linear structure can trip up beginners.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;As for general resources, I think you can&amp;rsquo;t go wrong with the incredibly gentle and thorough &lt;a href=&#34;https://haskellbook.com/&#34;&gt;&lt;em&gt;Haskell Programming from First Principles&lt;/em&gt;&lt;/a&gt;;
+just be aware that it is a hefty tome weighing in at about 1200 pages!&lt;/p&gt;
+&lt;h2 id=&#34;terseness&#34;&gt;Terseness&lt;/h2&gt;
+&lt;p&gt;I argue that Haskell is a terse language in two senses:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;syntactically&lt;/em&gt;, i.e., concepts can be expressed with a minimum of syntactic ceremony&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;; and&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;semantically&lt;/em&gt;, i.e., certain omitted details can be automatically inferred by the compiler.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Together, these imply you can express powerful concepts with a small amount of code.
+The challenge is also two-fold:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;syntactically&lt;/em&gt; terse languages provide less syntactic pointers that describe the meaning of the code;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;semantically&lt;/em&gt; terse languages may require the programmer to &lt;em&gt;explicitly&lt;/em&gt; reconstruct details that are only &lt;em&gt;implicitly&lt;/em&gt; described in the code.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Both of these items &lt;em&gt;empower&lt;/em&gt; experts who are already fluent in a language but can &lt;em&gt;impede&lt;/em&gt; beginners who wish to learn it (though not always).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+There are two main recommendations here:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Use text editors with syntax highlighting to alleviate potential syntactic confusion;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Learn and lean on interactive debugging tools like GHCi whenever possible that can:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;show all reconstructed details that were omitted from the codebase;&lt;/li&gt;
+&lt;li&gt;step through the process taken to arrive at some conclusion.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;show-me&#34;&gt;Show Me&lt;/h2&gt;
+&lt;p&gt;As a beginner, when you open up GHCi and try to get help for some common function, say &lt;code&gt;foldl&lt;/code&gt;, you may naturally type:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ghci&amp;gt; foldl  
+error:  
+• No instance for (Show ((b0 -&amp;gt; a0 -&amp;gt; b0) -&amp;gt; b0 -&amp;gt; [a0] -&amp;gt; b0)) arising from a use of ‘print’  
+• In a stmt of an interactive GHCi command: print it
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Unfortunately, this error message is not very helpful for a beginner.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Use the GHCi &lt;code&gt;:type&lt;/code&gt; or &lt;code&gt;:info&lt;/code&gt; commands.
+I am a bit surprised the interpreter does not directly provide this hint;  it would save all beginners at least one internet search.&lt;/p&gt;
+&lt;h2 id=&#34;parallel-worlds&#34;&gt;Parallel Worlds&lt;/h2&gt;
+&lt;p&gt;There are two totally separate, almost parallel worlds in Haskell: the world of terms and the world of types.
+However, sometimes there are parallel entities which exist in &lt;em&gt;both&lt;/em&gt; worlds which have the &lt;em&gt;same&lt;/em&gt; name.
+As an example, consider this definition:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On the left hand side of the equals sign, we are defining a type constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a type variable &lt;code&gt;a&lt;/code&gt;.
+Conversely, on the right hand side of the equals sign, we are defining a term constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a term variable &lt;code&gt;a&lt;/code&gt;.
+This means we can write things like:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Types -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;::&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Terms -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Experienced Haskellers know that:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;the first line is a type signature and makes a statement about the world of types;&lt;/li&gt;
+&lt;li&gt;the second line is a function definition and makes a statement about the world of terms (though type names can still creep if types cannot be inferred).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Thus, experienced Haskellers know that &lt;code&gt;Bar Int&lt;/code&gt; in the first line must refer to a type constructor and &lt;code&gt;Bar x&lt;/code&gt; on second line refers to a term constructor.
+However, for a beginner, this overlap can be confusing.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+N/A&lt;/p&gt;
+&lt;h3 id=&#34;even-more-parallel-worlds&#34;&gt;Even More Parallel Worlds&lt;/h3&gt;
+&lt;p&gt;You might think that two parallel meanings of a word was enough&amp;hellip; but Haskell doesn&amp;rsquo;t mess around.
+For extra credit, we can enable the &lt;code&gt;-XDataKinds&lt;/code&gt; extension.
+With this extension, the compiler generates a third parallel world of &lt;em&gt;kinds&lt;/em&gt; which can be used in type-level programming.&lt;/p&gt;
+&lt;p&gt;With &lt;code&gt;-XDataKinds&lt;/code&gt; enabled, upon seeing a data declaration, (in most cases) the compiler will implicitly generate a new kind with new types to inhabit it.
+In the book &lt;a href=&#34;https://thinkingwithtypes.com&#34;&gt;&lt;em&gt;Thinking With Types&lt;/em&gt;&lt;/a&gt;, the author Sandy Maguire invents a kind declaration notation to describe the way this is done.
+As an example, recall the &lt;code&gt;Bar&lt;/code&gt; declaration above.
+When the compiler sees this type declaration:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It will implicitly generate a kind declaration (not valid Haskell syntax):&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;kind&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;  &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;&amp;#39;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----     ------&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Kind       Type   -- world&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--  (Type)     (Term)  -- world promoted from&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.&lt;/p&gt;
+&lt;p&gt;Thus, in our final tally, &lt;code&gt;Bar&lt;/code&gt; (possibly with a leading single quote) now has four possible usages:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;Bar&lt;/code&gt; - a term constructor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Bar&lt;/code&gt; - a type constructor&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&#39;Bar&lt;/code&gt; - a type constructor (i.e. a promoted term constructor)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Bar&lt;/code&gt; - a kind (i.e. a promoted type constructor)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Fortunately, the &lt;code&gt;-XDataKinds&lt;/code&gt; extension is only needed for type-level programming.
+Most of the time, Haskellers can safely ignore this.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Be aware of the &lt;code&gt;-XDataKinds&lt;/code&gt; extension and its associated syntax.
+That way, when you see this syntax in other code, you will won&amp;rsquo;t be confused (it&amp;rsquo;s hard to search for syntax online!).
+If you want to dive deeper into this subject, I can recommend Sandy&amp;rsquo;s book &lt;a href=&#34;https://thinkingwithtypes.com&#34;&gt;&lt;em&gt;Thinking With Types&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;higher-kinded-types&#34;&gt;Higher-Kinded Types&lt;/h2&gt;
+&lt;p&gt;Higher-kinded types (HKTs) offer a lot of power, i.e., type constructors which take types as arguments.
+If you are unfamiliar with this concept, think of types like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;[] :: Type -&amp;gt; Type&lt;/code&gt;&lt;br&gt;
+Comment: takes type &lt;code&gt;a&lt;/code&gt; to lists of type &lt;code&gt;a&lt;/code&gt;&lt;br&gt;
+Example: &lt;code&gt;[String]&lt;/code&gt; - type of lists of strings&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Maybe :: Type -&amp;gt; Type&lt;/code&gt;&lt;br&gt;
+Comment: takes type &lt;code&gt;a&lt;/code&gt; to optional &lt;code&gt;a&lt;/code&gt;&lt;br&gt;
+Example: &lt;code&gt;Maybe Int&lt;/code&gt; - type of optional integers&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;(-&amp;gt;) :: Type -&amp;gt; Type -&amp;gt; Type&lt;/code&gt;&lt;br&gt;
+Comment: takes types &lt;code&gt;a&lt;/code&gt; and &lt;code&gt;b&lt;/code&gt; to functions from &lt;code&gt;a&lt;/code&gt; to &lt;code&gt;b&lt;/code&gt;&lt;br&gt;
+Example: &lt;code&gt;Int -&amp;gt; Bool&lt;/code&gt; - type of functions from &lt;code&gt;Int&lt;/code&gt; to &lt;code&gt;Bool&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These are only first-order higher-kinded types.
+We also have examples of second-order types.
+Most commonly, these are types defined implicitly by type classes.
+Examples include&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Functor :: (Type -&amp;gt; Type) -&amp;gt; Type&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Monad :: (Type -&amp;gt; Type) -&amp;gt; Type&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The fact that types not only act as functions at the type level&amp;mdash;but as higher-order functions&amp;mdash;was challenging.
+As we&amp;rsquo;ll see in the next section, partial application of HKTs takes the challenge up a notch.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Learn about higher-order functions (you&amp;rsquo;ll want to do this anyway).
+Make a mental note that types in Haskell are functions at the type-level.&lt;/p&gt;
+&lt;h3 id=&#34;partially-applied-hkts-in-type-class-instances&#34;&gt;Partially Applied HKTs in Type Class Instances&lt;/h3&gt;
+&lt;p&gt;Oftentimes, we want to create a type class instance for a type whose kind doesn&amp;rsquo;t quite match the type class.
+As an example, recall the arrow type &lt;code&gt;(-&amp;gt;)&lt;/code&gt; which takes two type arguments.
+We would like to apply the &lt;code&gt;Functor&lt;/code&gt; type constructor to arrow type, but we cannot, because the kind signatures don&amp;rsquo;t match up.
+&lt;code&gt;Functor&lt;/code&gt; needs an argument of kind &lt;code&gt;Type -&amp;gt; Type&lt;/code&gt;, but &lt;code&gt;(-&amp;gt;)&lt;/code&gt; has kind &lt;code&gt;Type -&amp;gt; Type -&amp;gt; Type&lt;/code&gt;.
+To solve this problem, we can &lt;em&gt;partially apply&lt;/em&gt; type constructors.&lt;/p&gt;
+&lt;p&gt;Many examples of partial application of HKTs occur in the type class hierarchy including:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;The &lt;code&gt;Functor&lt;/code&gt; instance for arrow types: &lt;code&gt;instance Functor ((-&amp;gt;) r)&lt;/code&gt;.
+Here we partially applied the arrow constructor with only one type.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The &lt;code&gt;Monad&lt;/code&gt; instance for &lt;code&gt;StateT&lt;/code&gt; used by the type synonym &lt;code&gt;State&lt;/code&gt;: &lt;code&gt;instance Monad m =&amp;gt; Monad (StateT s m)&lt;/code&gt;.
+Here we partially applied the &lt;code&gt;StateT&lt;/code&gt; contructor with two types.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The trickiness of partially applied HKTs in type instances is that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the HKT argument in the type instance definition is partially applied but;&lt;/li&gt;
+&lt;li&gt;the missing type(s) are specified in the type class definition.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A naive Haskeller may not even realize that they are working with a partially applied HKT.
+This partial application is only apparent if one has previously seen the type constructor or type class definition in question.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Learn about currying (you&amp;rsquo;ll want to do this anyway).
+Amend the mental note you just made to state that type constructors in Haskell are actually &lt;em&gt;curried&lt;/em&gt; functions at the type-level and can be partially applied.&lt;/p&gt;
+&lt;h2 id=&#34;extensive-extensions&#34;&gt;Extensive Extensions&lt;/h2&gt;
+&lt;p&gt;All popular programming languages evolve into new versions over time.
+When this happens, a developer has to choose if and how to do version migration.
+However, for some languages (like Haskell), the choice is more nuanced.&lt;/p&gt;
+&lt;p&gt;In addition to versions, Haskell has a sizeable collection of extensions, i.e., language-level features that can radically change the meaning of programs.
+These extensions can add, remove, or reinterpret existing syntactic constructs and even modify core compiler behaviors.&lt;/p&gt;
+&lt;p&gt;This leads to several issues:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The proliferation of extensions can lead to confusion about what syntax is accepted and what code compiles in what context.&lt;/li&gt;
+&lt;li&gt;Each extension must be learned additionally on top of the core Haskell specification and standard library.
+For a language as complex as Haskell, that&amp;rsquo;s a big ask.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Fortunately, there have been efforts to curb or mitigate the extension explosion.
+Newer versions of GHC (the Haskell compiler) enable popular extensions by default (a way of standardizing the extension set) and often emit warnings when code requires a specific extension.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Don&amp;rsquo;t try to learn all of the extensions; it&amp;rsquo;s tons of work and many of them are deprecated.
+Do consult the &lt;a href=&#34;https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/exts.html&#34;&gt;official extension list&lt;/a&gt; in the GHC user guide when needed.&lt;/p&gt;
+&lt;h2 id=&#34;build-tools&#34;&gt;Build Tools&lt;/h2&gt;
+&lt;p&gt;Build tools (and package formats) are all about gathering dependencies and build recipes for your code so that someone else can build it on their machine without your help.
+Currently, the Haskell community is currently split between two seemingly good similar-but-different build tools: Cabal (2004) and Stack (2015).&lt;/p&gt;
+&lt;p&gt;When I first started learning Haskell, Cabal was the only option available (though at that time I never needed it).
+Later in my Haskell journey, I discovered Stack, which I used almost exclusively since then.
+While I find Stack generally works well, I also find it to be complex.&lt;/p&gt;
+&lt;p&gt;Unlike Python pip or the Node package manager, Stack seems to discourage interactive installation of packages.
+Instead, users are directed to edit their &lt;code&gt;stack.yaml&lt;/code&gt; and let Stack install packaged dependencies and build the project as necessary.
+When I first started, I was somewhat confused because the experience was different from what I had used previously.&lt;/p&gt;
+&lt;p&gt;So, the trade-off seems to be: a more complex setup process in exchange for a more documented and reproducible build.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Pick a build tool between the two options and stick with it.
+Carefully read the &lt;a href=&#34;https://docs.haskellstack.org/en/stable/README/&#34;&gt;Stack&lt;/a&gt; or &lt;a href=&#34;https://cabal.readthedocs.io/en/stable/&#34;&gt;Cabal&lt;/a&gt; user guide.&lt;/p&gt;
+&lt;h1 id=&#34;wrapping-up&#34;&gt;Wrapping Up&lt;/h1&gt;
+&lt;p&gt;If you&amp;rsquo;ve made it this far, thanks for following along!&lt;/p&gt;
+&lt;p&gt;If you&amp;rsquo;re a newcomer to Haskell, I hope you learned something from this post.&lt;/p&gt;
+&lt;p&gt;Haskell is an ambitious and fun language that allows you to write compact, fast, and safe code in a functional style.
+Partially due to these demanding goals, Haskell has &lt;em&gt;a lot&lt;/em&gt; of moving parts.
+Mastering it takes time.&lt;/p&gt;
+&lt;p&gt;In parting, let me close with one last tip.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
+Use the right tool for the right job.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;I guess the old adage that you need a PhD to learn Haskell turned out to be true&amp;hellip; at least in my case.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
+&lt;p&gt;The fact that a language has a terse syntax does not imply that it has a simple syntax.
+Clearly, Haskell has fairly complex syntax with its rules about indentation and bracketing and a plethora of extensions that give you the ability to write the same program in many different ways (e.g. ADT vs GADT syntax, guards/where clauses vs. if/pattern match, etc).
+Arguably, array-like languages like APL represent the extreme of terse and simple syntaxes.&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34;&gt;
+&lt;p&gt;Technically, the constructors which are implicitly defined for type classes inhabit the &lt;code&gt;Constraint&lt;/code&gt; kind instead of the &lt;code&gt;Type&lt;/code&gt; kind&amp;mdash;but that is more of an implementation detail.&amp;#160;&lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     
     
