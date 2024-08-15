@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head>
+<html lang="en"><head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Your site description">
@@ -140,15 +140,15 @@ I am a bit surprised the interpreter does not directly provide this hint;  it wo
 <p>There are two totally separate, almost parallel worlds in Haskell: the world of terms and the world of types.
 However, sometimes there are parallel entities which exist in <em>both</em> worlds which have the <em>same</em> name.
 As an example, consider this definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   -----   -----</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   Type    Term</span>
-</span></span></code></pre></div><p>On the left hand side of the equals sign, we are defining a type constructor <code>Bar</code> parameterized over a type variable <code>a</code>.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
+<span class="c1">--   -----   -----</span>
+<span class="c1">--   Type    Term</span>
+</code></pre></div><p>On the left hand side of the equals sign, we are defining a type constructor <code>Bar</code> parameterized over a type variable <code>a</code>.
 Conversely, on the right hand side of the equals sign, we are defining a term constructor <code>Bar</code> parameterized over a term variable <code>a</code>.
 This means we can write things like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="cm">{- Types -}</span> <span class="n">intBar</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Bar</span> <span class="kt">Int</span>
-</span></span><span class="line"><span class="cl"><span class="cm">{- Terms -}</span> <span class="n">intBar</span> <span class="n">x</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">x</span>
-</span></span></code></pre></div><p>Experienced Haskellers know that:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="cm">{- Types -}</span> <span class="n">intBar</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Bar</span> <span class="kt">Int</span>
+<span class="cm">{- Terms -}</span> <span class="n">intBar</span> <span class="n">x</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">x</span>
+</code></pre></div><p>Experienced Haskellers know that:</p>
 <ol>
 <li>the first line is a type signature and makes a statement about the world of types;</li>
 <li>the second line is a function definition and makes a statement about the world of terms (though type names can still creep if types cannot be inferred).</li>
@@ -165,15 +165,15 @@ With this extension, the compiler generates a third parallel world of <em>kinds<
 In the book <a href="https://thinkingwithtypes.com"><em>Thinking With Types</em></a>, the author Sandy Maguire invents a kind declaration notation to describe the way this is done.
 As an example, recall the <code>Bar</code> declaration above.
 When the compiler sees this type declaration:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   -----   -----</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   Type    Term</span>
-</span></span></code></pre></div><p>It will implicitly generate a kind declaration (not valid Haskell syntax):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="nf">kind</span> <span class="kt">Bar</span> <span class="n">a</span>  <span class="ow">=</span>  <span class="kt">&#39;Bar</span> <span class="n">a</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   -----     ------</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   Kind       Type   -- world</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--  (Type)     (Term)  -- world promoted from</span>
-</span></span></code></pre></div><p>where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
+<span class="c1">--   -----   -----</span>
+<span class="c1">--   Type    Term</span>
+</code></pre></div><p>It will implicitly generate a kind declaration (not valid Haskell syntax):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="nf">kind</span> <span class="kt">Bar</span> <span class="n">a</span>  <span class="ow">=</span>  <span class="kt">&#39;Bar</span> <span class="n">a</span>
+<span class="c1">--   -----     ------</span>
+<span class="c1">--   Kind       Type   -- world</span>
+<span class="c1">--  (Type)     (Term)  -- world promoted from</span>
+</code></pre></div><p>where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.</p>
 <p>Thus, in our final tally, <code>Bar</code> (possibly with a leading single quote) now has four possible usages:</p>
 <ol>
 <li><code>Bar</code> - a term constructor</li>
@@ -286,22 +286,22 @@ Mastering it takes time.</p>
 <p>In parting, let me close with one last tip.</p>
 <p><em>Recommendation</em>:
 Use the right tool for the right job.</p>
-<div class="footnotes" role="doc-endnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn:1">
+<li id="fn:1" role="doc-endnote">
 <p>I guess the old adage that you need a PhD to learn Haskell turned out to be true&hellip; at least in my case.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:2">
+<li id="fn:2" role="doc-endnote">
 <p>The fact that a language has a terse syntax does not imply that it has a simple syntax.
 Clearly, Haskell has fairly complex syntax with its rules about indentation and bracketing and a plethora of extensions that give you the ability to write the same program in many different ways (e.g. ADT vs GADT syntax, guards/where clauses vs. if/pattern match, etc).
 Arguably, array-like languages like APL represent the extreme of terse and simple syntaxes.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:3">
+<li id="fn:3" role="doc-endnote">
 <p>Technically, the constructors which are implicitly defined for type classes inhabit the <code>Constraint</code> kind instead of the <code>Type</code> kind&mdash;but that is more of an implementation detail.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
-</div>
+</section>
 </article>
 
         </main><footer id="footer">

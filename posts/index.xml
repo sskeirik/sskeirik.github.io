@@ -129,15 +129,15 @@ I am a bit surprised the interpreter does not directly provide this hint;  it wo
 &lt;p&gt;There are two totally separate, almost parallel worlds in Haskell: the world of terms and the world of types.
 However, sometimes there are parallel entities which exist in &lt;em&gt;both&lt;/em&gt; worlds which have the &lt;em&gt;same&lt;/em&gt; name.
 As an example, consider this definition:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On the left hand side of the equals sign, we are defining a type constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a type variable &lt;code&gt;a&lt;/code&gt;.
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On the left hand side of the equals sign, we are defining a type constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a type variable &lt;code&gt;a&lt;/code&gt;.
 Conversely, on the right hand side of the equals sign, we are defining a term constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a term variable &lt;code&gt;a&lt;/code&gt;.
 This means we can write things like:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Types -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;::&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Terms -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Experienced Haskellers know that:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Types -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;::&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt;
+&lt;span class=&#34;cm&#34;&gt;{- Terms -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Experienced Haskellers know that:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;the first line is a type signature and makes a statement about the world of types;&lt;/li&gt;
 &lt;li&gt;the second line is a function definition and makes a statement about the world of terms (though type names can still creep if types cannot be inferred).&lt;/li&gt;
@@ -154,15 +154,15 @@ With this extension, the compiler generates a third parallel world of &lt;em&gt;
 In the book &lt;a href=&#34;https://thinkingwithtypes.com&#34;&gt;&lt;em&gt;Thinking With Types&lt;/em&gt;&lt;/a&gt;, the author Sandy Maguire invents a kind declaration notation to describe the way this is done.
 As an example, recall the &lt;code&gt;Bar&lt;/code&gt; declaration above.
 When the compiler sees this type declaration:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It will implicitly generate a kind declaration (not valid Haskell syntax):&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;kind&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;  &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;&amp;#39;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----     ------&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Kind       Type   -- world&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--  (Type)     (Term)  -- world promoted from&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It will implicitly generate a kind declaration (not valid Haskell syntax):&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;nf&#34;&gt;kind&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;  &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;&amp;#39;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--   -----     ------&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--   Kind       Type   -- world&lt;/span&gt;
+&lt;span class=&#34;c1&#34;&gt;--  (Type)     (Term)  -- world promoted from&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.&lt;/p&gt;
 &lt;p&gt;Thus, in our final tally, &lt;code&gt;Bar&lt;/code&gt; (possibly with a leading single quote) now has four possible usages:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;code&gt;Bar&lt;/code&gt; - a term constructor&lt;/li&gt;
@@ -275,22 +275,22 @@ Mastering it takes time.&lt;/p&gt;
 &lt;p&gt;In parting, let me close with one last tip.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
 Use the right tool for the right job.&lt;/p&gt;
-&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
 &lt;hr&gt;
 &lt;ol&gt;
-&lt;li id=&#34;fn:1&#34;&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
 &lt;p&gt;I guess the old adage that you need a PhD to learn Haskell turned out to be true&amp;hellip; at least in my case.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id=&#34;fn:2&#34;&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
 &lt;p&gt;The fact that a language has a terse syntax does not imply that it has a simple syntax.
 Clearly, Haskell has fairly complex syntax with its rules about indentation and bracketing and a plethora of extensions that give you the ability to write the same program in many different ways (e.g. ADT vs GADT syntax, guards/where clauses vs. if/pattern match, etc).
 Arguably, array-like languages like APL represent the extreme of terse and simple syntaxes.&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id=&#34;fn:3&#34;&gt;
+&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
 &lt;p&gt;Technically, the constructors which are implicitly defined for type classes inhabit the &lt;code&gt;Constraint&lt;/code&gt; kind instead of the &lt;code&gt;Type&lt;/code&gt; kind&amp;mdash;but that is more of an implementation detail.&amp;#160;&lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;/div&gt;
+&lt;/section&gt;
 </description>
     </item>
     
