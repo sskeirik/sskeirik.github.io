@@ -6,9 +6,69 @@
     <description>Recent content in Posts on srs.fyi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Sat, 30 Jul 2022 11:17:00 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 17 Feb 2026 23:50:49 -0500</lastBuildDate>
     
 	<atom:link href="https://srs.fyi/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Four Years and Beyond</title>
+      <link>https://srs.fyi/four-years-and-beyond/</link>
+      <pubDate>Tue, 17 Feb 2026 23:15:00 -0500</pubDate>
+      
+      <guid>https://srs.fyi/four-years-and-beyond/</guid>
+      <description>&lt;p&gt;I originally kicked off this blog around April 2022.
+It&amp;rsquo;s now February 2026 and nearly four years (a.k.a one quadrennium&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;) have passed.
+How has this blog progressed?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;I published 3 posts (including this one).&lt;/li&gt;
+&lt;li&gt;I authored 9 draft posts (defined as an unpublished post over 300 words with an average/median word count of ~2000/2300 words).&lt;/li&gt;
+&lt;li&gt;I sketched out 9 post ideas (defined as an unpublished post with 300 words or less).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If I also count unpublished draft posts, then my average post output over the past four years is 3 posts/year.&lt;/p&gt;
+&lt;p&gt;On the one hand, I feel proud that I have maintained some form of writing in the midst of the busy-ness of life.
+On the other hand, I feel like this blog has fallen short of the dream that I had when I started it (more on that below).
+Adding to my own confusion, I have been wondering lately how much of the desire to produce this blog came from trying to be somebody.&lt;/p&gt;
+&lt;p&gt;Let me continue on this last point for a moment.
+I believe, in the last decade, two dictums took root broadly in the online tech discourse:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;em&gt;You need a blog&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Why? Because job, usually (c.f. &lt;em&gt;you need open-source contributions&lt;/em&gt;) and also because professionals (and cool people) have them.
+But sometimes, because you must&amp;hellip;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;em&gt;Produce, don&amp;rsquo;t consume&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Or, in other words, via &lt;em&gt;building&lt;/em&gt;, become a productive netizen and reject the vicious cycle of doom-scrolling and societal passivity that increasingly define the modern internet age.&lt;/p&gt;
+&lt;p&gt;Unsurprisingly, among tech enthusiasts, this usually means some kind of software, web page, or blog.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And so, as I began this blog, I think that these two ideas (combined with my own perfectionistic tendencies and a sizeable backlog of unpolished ideas) coalesced into this grand and grotesque vision:
+a blog that would both prove my career and my mettle, resolute against the empty clamor of a vampiric social media.&lt;/p&gt;
+&lt;p&gt;But as time passed, that lofty vision became a burden.
+Each post needed to be well-crafted &lt;em&gt;and&lt;/em&gt; well-researched (and hopefully at least a little bit interesting&amp;hellip;).
+Under that pressure, writing felt like a chore rather than an opportunity and incomplete sketches began to pile up.
+As the months and then years went by, at a subconscious level, I was anxious.&lt;/p&gt;
+&lt;p&gt;If professionals and cool people and productive netizens &lt;em&gt;write&lt;/em&gt; and &lt;em&gt;produce&lt;/em&gt;, what does this heap of unpublished blog posts say about &lt;em&gt;me&lt;/em&gt;?&lt;/p&gt;
+&lt;p&gt;Writing is hard enough without FOMO and shame muddying the waters.
+It requires time and discipline and passion and the courage to publish.
+It may sound cliché, but I don&amp;rsquo;t want to keep carrying the weight of trying to be that &lt;em&gt;guy&lt;/em&gt; anymore.&lt;/p&gt;
+&lt;p&gt;To be clear, it&amp;rsquo;s not that I wish to abandon this blog or to jettison all standards of writing or clarity of thought; far from it.
+What I want is to make peace with my own writing process and to let go of unrealistic and unhelpful expectations for what is currently a minor side-project in an otherwise full life.
+Put more simply: I want the &lt;em&gt;next&lt;/em&gt; four years of this blog to feel a lot more free than the &lt;em&gt;first&lt;/em&gt; four years.&lt;/p&gt;
+&lt;p&gt;When did technological output become a measure of my legacy on the same level as lasting friendships, a healthy family, and a thriving community?&lt;/p&gt;
+&lt;p&gt;If you (or I) write or produce, let it be because we find joy in the journey.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;Did I know the word quadrennium before writing this post? No, I did not&amp;mdash;I merely had a vague sense that it &lt;em&gt;should&lt;/em&gt; exist based on word roots. But big words are neat, don&amp;rsquo;tcha think?&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     
     
@@ -129,15 +189,15 @@ I am a bit surprised the interpreter does not directly provide this hint;  it wo
 &lt;p&gt;There are two totally separate, almost parallel worlds in Haskell: the world of terms and the world of types.
 However, sometimes there are parallel entities which exist in &lt;em&gt;both&lt;/em&gt; worlds which have the &lt;em&gt;same&lt;/em&gt; name.
 As an example, consider this definition:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On the left hand side of the equals sign, we are defining a type constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a type variable &lt;code&gt;a&lt;/code&gt;.
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;On the left hand side of the equals sign, we are defining a type constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a type variable &lt;code&gt;a&lt;/code&gt;.
 Conversely, on the right hand side of the equals sign, we are defining a term constructor &lt;code&gt;Bar&lt;/code&gt; parameterized over a term variable &lt;code&gt;a&lt;/code&gt;.
 This means we can write things like:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Types -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;::&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt;
-&lt;span class=&#34;cm&#34;&gt;{- Terms -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Experienced Haskellers know that:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Types -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;::&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Int&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;{- Terms -}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;intBar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Experienced Haskellers know that:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;the first line is a type signature and makes a statement about the world of types;&lt;/li&gt;
 &lt;li&gt;the second line is a function definition and makes a statement about the world of terms (though type names can still creep if types cannot be inferred).&lt;/li&gt;
@@ -145,7 +205,7 @@ This means we can write things like:&lt;/p&gt;
 &lt;p&gt;Thus, experienced Haskellers know that &lt;code&gt;Bar Int&lt;/code&gt; in the first line must refer to a type constructor and &lt;code&gt;Bar x&lt;/code&gt; on second line refers to a term constructor.
 However, for a beginner, this overlap can be confusing.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
-N/A&lt;/p&gt;
+Practice observing type annotation syntax and recognizing that the same syntax, contextually, may have a different meaning.&lt;/p&gt;
 &lt;h3 id=&#34;even-more-parallel-worlds&#34;&gt;Even More Parallel Worlds&lt;/h3&gt;
 &lt;p&gt;You might think that two parallel meanings of a word was enough&amp;hellip; but Haskell doesn&amp;rsquo;t mess around.
 For extra credit, we can enable the &lt;code&gt;-XDataKinds&lt;/code&gt; extension.
@@ -154,15 +214,15 @@ With this extension, the compiler generates a third parallel world of &lt;em&gt;
 In the book &lt;a href=&#34;https://thinkingwithtypes.com&#34;&gt;&lt;em&gt;Thinking With Types&lt;/em&gt;&lt;/a&gt;, the author Sandy Maguire invents a kind declaration notation to describe the way this is done.
 As an example, recall the &lt;code&gt;Bar&lt;/code&gt; declaration above.
 When the compiler sees this type declaration:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It will implicitly generate a kind declaration (not valid Haskell syntax):&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;nf&#34;&gt;kind&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;  &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;&amp;#39;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--   -----     ------&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--   Kind       Type   -- world&lt;/span&gt;
-&lt;span class=&#34;c1&#34;&gt;--  (Type)     (Term)  -- world promoted from&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----   -----&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Type    Term&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It will implicitly generate a kind declaration (not valid Haskell syntax):&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-haskell&#34; data-lang=&#34;haskell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;kind&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;  &lt;span class=&#34;ow&#34;&gt;=&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;&amp;#39;Bar&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   -----     ------&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--   Kind       Type   -- world&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;--  (Type)     (Term)  -- world promoted from&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.&lt;/p&gt;
 &lt;p&gt;Thus, in our final tally, &lt;code&gt;Bar&lt;/code&gt; (possibly with a leading single quote) now has four possible usages:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;code&gt;Bar&lt;/code&gt; - a term constructor&lt;/li&gt;
@@ -275,22 +335,22 @@ Mastering it takes time.&lt;/p&gt;
 &lt;p&gt;In parting, let me close with one last tip.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Recommendation&lt;/em&gt;:
 Use the right tool for the right job.&lt;/p&gt;
-&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
 &lt;hr&gt;
 &lt;ol&gt;
-&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
 &lt;p&gt;I guess the old adage that you need a PhD to learn Haskell turned out to be true&amp;hellip; at least in my case.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
 &lt;p&gt;The fact that a language has a terse syntax does not imply that it has a simple syntax.
 Clearly, Haskell has fairly complex syntax with its rules about indentation and bracketing and a plethora of extensions that give you the ability to write the same program in many different ways (e.g. ADT vs GADT syntax, guards/where clauses vs. if/pattern match, etc).
 Arguably, array-like languages like APL represent the extreme of terse and simple syntaxes.&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
-&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;li id=&#34;fn:3&#34;&gt;
 &lt;p&gt;Technically, the constructors which are implicitly defined for type classes inhabit the &lt;code&gt;Constraint&lt;/code&gt; kind instead of the &lt;code&gt;Type&lt;/code&gt; kind&amp;mdash;but that is more of an implementation detail.&amp;#160;&lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;/section&gt;
+&lt;/div&gt;
 </description>
     </item>
     
