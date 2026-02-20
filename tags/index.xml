@@ -12,6 +12,1010 @@
     
     
     <item>
+      <title>See Conversions</title>
+      <link>https://srs.fyi/see-conversions/</link>
+      <pubDate>Thu, 19 Feb 2026 22:57:00 -0400</pubDate>
+      
+      <guid>https://srs.fyi/see-conversions/</guid>
+      <description>&lt;p&gt;I recently&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; stumbled across an interesting C function.
+The function was quite simple&amp;ndash;just a few lines long&amp;mdash;so I was sure I understood it.
+And yet, the function produced unexpected results&amp;mdash;and I could not understand why.
+Debugging this tiny function led me down the dark hole that is implicit type conversions in C.
+I have reproduced the function in its entirety below (with a 2-line modification to make the output more readable for this post).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// requires bytes+0 to bytes+sz are valid memory addresses
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;size_t&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;{&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// added for readability
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;%02x&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;}&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// added for readability
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;To avoid making this post too long&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;, I assume the reader is familiar with &lt;a href=&#34;https://en.wikipedia.org/wiki/Hexadecimal&#34;&gt;hexadecimal notation&lt;/a&gt; and C language &lt;a href=&#34;https://en.cppreference.com/w/c/language/escape.html&#34;&gt;string escape sequences&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;From first glance, we can see this this function will misbehave if the memory region argument is invalid.
+But if we do that, that&amp;rsquo;s on us&amp;mdash;we failed to respect the contract of this function.&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Here is a complete example program containing this function that applies it to a few test vectors.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;string.h&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// requires bytes+0 to bytes+sz are valid memory addresses
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;size_t&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;{&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// added for readability
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;%02x&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;}&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// added for readability
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;     &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// empty string
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;   &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\x00&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// singleton; smallest possible byte value
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;   &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\x01&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// singleton; smallest + 1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;   &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\xff&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// singleton; largest possible byte value
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;   &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\xfe&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// singleton; largest - 1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;What text do you expect this function will print?
+To avoid confusion, let&amp;rsquo;s assume we&amp;rsquo;re running this program on a standard x86-64 Linux box.&lt;/p&gt;
+&lt;p&gt;Take your time and think about it for a second.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt;
+&lt;u&gt;If you need a hint, you can consult my mini-explainer of format strings by clicking here.&lt;/u&gt;
+&lt;/summary&gt;
+&lt;p&gt;An altogether-too-brief introduction to format strings:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;printf&lt;/code&gt; family of functions all are designed to print formatted text to a buffer or file.&lt;/li&gt;
+&lt;li&gt;Their first argument is always a &lt;em&gt;format string&lt;/em&gt; that contains 0 or more &lt;em&gt;conversion specifications&lt;/em&gt;.&lt;/li&gt;
+&lt;li&gt;A &lt;em&gt;conversion specification&lt;/em&gt; tells &lt;code&gt;printf&lt;/code&gt; how to process a particular argument.&lt;/li&gt;
+&lt;li&gt;If the &lt;em&gt;format string&lt;/em&gt; has &lt;em&gt;N&lt;/em&gt; conversion specifications, the &lt;code&gt;printf&lt;/code&gt; call should have &lt;em&gt;N&lt;/em&gt; arguments (excluding the format string itself).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Example:&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;player&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;Bob&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pts&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;101&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;%s scored %u point(s)!&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;player&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;pts&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// prints: &amp;#34;Bob scored 101 point(s)!&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Our example had two conversion specifications:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;%s&lt;/code&gt; - which prints its corresponding argument as a string;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%u&lt;/code&gt; - which prints its corresponding argument as an unsigned &lt;em&gt;decimal&lt;/em&gt; integer.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In general, conversion specifications have the following structure:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;%[flags][width][precision][typesize]&amp;lt;conversion&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;where:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a literal &lt;code&gt;%&lt;/code&gt; symbol appears first;&lt;/li&gt;
+&lt;li&gt;arguments in angle (resp. square) brackets are &lt;em&gt;required&lt;/em&gt; (resp. &lt;em&gt;optional&lt;/em&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In our example program above, the conversion specification &lt;code&gt;%02x&lt;/code&gt; can be parsed as follows:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;%02x
+|||`- converts argument to an `unsigned int` and prints as a hexadecimal
+||`-- minimum width 2 characters
+|`--- optional flag 0 --- pad result with leading zeroes
+`---- this symbol introduces a conversion specification
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;So, to summarize, this conversion specification will:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;x&lt;/code&gt; - convert its argument to an unsigned int and print as hexadecimal;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;2&lt;/code&gt; - using a minimum of 2 characters;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;0&lt;/code&gt; - where the padding character is a &lt;code&gt;0&lt;/code&gt; instead of a space (&lt;code&gt; &lt;/code&gt;).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/details&gt;
+&lt;br/&gt;
+&lt;details&gt;
+&lt;summary&gt; &lt;u&gt;When you&#39;re ready, click here to see what text this program prints. &lt;/u&gt; &lt;/summary&gt;
+&lt;code&gt;
+{}&lt;br/&gt;
+{00}&lt;br/&gt;
+{01}&lt;br/&gt;
+{ffffffff}&lt;br/&gt;
+{fffffffe}&lt;br/&gt;
+&lt;/code&gt;
+&lt;/details&gt;
+&lt;br/&gt;
+Finally, if you want an explanation of this behavior, read on!
+&lt;br/&gt;
+&lt;br/&gt;
+&lt;br/&gt;
+&lt;hr&gt;
+&lt;br/&gt;
+&lt;p&gt;So, first things first: while the first two printed lines matched up with my expectations, the last two lines took me completely by surprise.
+At first glance, it looks like the last two function calls, intended to print out a &lt;em&gt;single byte&lt;/em&gt;, somehow printed out &lt;em&gt;four&lt;/em&gt; bytes.
+But how could that be?&lt;/p&gt;
+&lt;p&gt;The ultimate explanation for this (unexpected to me) behavior boils down to the fact that the behavior of this C program is &lt;em&gt;implementation-defined&lt;/em&gt;!&lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Why does this happen?
+This unusual behavior ultimately arises due to four interrelated factors:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Two&amp;rsquo;s complement encoding&lt;/p&gt;
+&lt;p&gt;All mainstream, modern, general-purpose computer architectures have a &lt;em&gt;binary&lt;/em&gt; memory (i.e., the smallest unit of memory is either 0 or 1)
+and represent numbers in binary using the &lt;a href=&#34;https://en.wikipedia.org/wiki/Two%27s_complement&#34;&gt;&lt;em&gt;two&amp;rsquo;s complement encoding&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Essentially, in this encoding, the most significant bit of a signed numeric type (called the &lt;em&gt;sign bit&lt;/em&gt;) is &lt;em&gt;negated&lt;/em&gt; while all other bits remain positive (like unsigned integers).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The signedness of type &lt;code&gt;char&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;While modern programmers may not think this way, the &lt;em&gt;C&lt;/em&gt; language standard actually defines &lt;em&gt;multiple, distinct&lt;/em&gt; &lt;code&gt;char&lt;/code&gt; types with different signedness!&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Default argument promotions&lt;/p&gt;
+&lt;p&gt;This mouthful of a phrase refers to a somewhat arcane corner of the &lt;em&gt;C&lt;/em&gt; standard.
+When considering a variadic function,
+what &lt;em&gt;type&lt;/em&gt; should its variadic parameters have in the function&amp;rsquo;s body?&lt;/p&gt;
+&lt;p&gt;For example, given variadic function &lt;code&gt;int printf(const char*, ...)&lt;/code&gt;, suppose we make a function call
+&lt;code&gt;printf(&amp;quot;%s scored %u point(s)!\n&amp;quot;, player, pts)&lt;/code&gt;.
+In the body of &lt;code&gt;printf&lt;/code&gt;, what type should the formal parameter binding argument &lt;code&gt;player&lt;/code&gt; take on?
+What about &lt;code&gt;pts&lt;/code&gt;?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Signed-to-Unsigned Integer Conversion&lt;/p&gt;
+&lt;p&gt;Given a signed integer value &lt;code&gt;i1&lt;/code&gt; of type &lt;code&gt;t1&lt;/code&gt; to be converted into unsigned type &lt;code&gt;t2&lt;/code&gt; with bit-width &lt;code&gt;b &amp;gt; 0&lt;/code&gt;, the process works as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If the &lt;code&gt;i1&lt;/code&gt; is within the range &lt;code&gt;[0,2^b)&lt;/code&gt;, then the result &lt;code&gt;i2 = i1&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;Otherwise, the result is &lt;code&gt;i2 = i1 + x*2^b&lt;/code&gt; for the unique&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt; integer &lt;code&gt;x&lt;/code&gt; such that &lt;code&gt;0 &amp;lt;= i2 &amp;lt; 2^b&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We&amp;rsquo;ll discuss each of these factors in detail below.&lt;/p&gt;
+&lt;h3 id=&#34;twos-complement-encoding&#34;&gt;Two&amp;rsquo;s Complement Encoding&lt;/h3&gt;
+&lt;p&gt;There isn&amp;rsquo;t much more to say about this encoding that hasn&amp;rsquo;t already been said.&lt;/p&gt;
+&lt;p&gt;Thus, in this section, we&amp;rsquo;ll focus on a small example:
+all 3 bit sequences written in a big-endian notation (i.e., with the most significant bit written first) and their two&amp;rsquo;s complement values:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Binary&lt;/th&gt;
+&lt;th&gt;       &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Value&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;011&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;010&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;001&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;000&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;111&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;110&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;101&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;100&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;br/&gt;
+&lt;details&gt;
+&lt;summary&gt; If this is all gibberish to you, you can read more here. &lt;/summary&gt;
+&lt;p&gt;To understand these values, there are a few important things to note:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Like I mentioned above, we &lt;em&gt;negate&lt;/em&gt; the value of the first (leftmost) bit.&lt;/li&gt;
+&lt;li&gt;Since this is a big-endian binary string, we label each bit position, starting from the &lt;em&gt;right&lt;/em&gt;, as position 0, 1, 2, and so forth.&lt;/li&gt;
+&lt;li&gt;Then the value of the bit &lt;code&gt;b&lt;/code&gt; in position &lt;code&gt;i&lt;/code&gt; is equal to &lt;code&gt;b * 2^i&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Finally, the value of an entire string is equal to the sum of values of each of its bits.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Let&amp;rsquo;s stick with 3 bit strings like we used in the table above.
+Given a 3-bit string &lt;code&gt;b2 b1 b0&lt;/code&gt;, its value will be equal to:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;-(b2 * 2^2) + (b1 * 2^1) + (b0 * 2^0)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Again, note that we negated the value of the most significant bit.&lt;/p&gt;
+&lt;p&gt;Using this template, we&amp;rsquo;ll work through one simple example.
+By applying this template to concrete bit string &lt;code&gt;100&lt;/code&gt;, we obtain the expression:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;-(1 * 2^2) + (0 * 2^1) + (0 * 2^0)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Simplifying the exponents, we get:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;-(1 * 4) + (0 * 2) + (0 * 1)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Simplifying the multiplications gives:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;-(4) + (0) + (0)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Finally, simplifying the additions gives &lt;code&gt;-4&lt;/code&gt;, as we claimed in our table above.&lt;/p&gt;
+&lt;/details&gt;
+&lt;h3 id=&#34;signedness-of-char&#34;&gt;Signedness of &lt;code&gt;char&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;How many versions of &lt;code&gt;char&lt;/code&gt; are there?
+In fact, there are &lt;em&gt;three&lt;/em&gt;:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Type&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Numeric Range&lt;sup id=&#34;fnref:6&#34;&gt;&lt;a href=&#34;#fn:6&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;6&lt;/a&gt;&lt;/sup&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;em&gt;[0, 255]&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;em&gt;[-128, 127]&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;em&gt;either [0, 255] or [-128, 127]&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;However, on common platforms, the range of &lt;code&gt;char&lt;/code&gt; and &lt;code&gt;signed char&lt;/code&gt; have equal ranges.&lt;/p&gt;
+&lt;p&gt;But why &lt;em&gt;three&lt;/em&gt; separate &lt;code&gt;char&lt;/code&gt; types?
+These various types map to &lt;em&gt;three&lt;/em&gt; distinct ways that &lt;code&gt;char&lt;/code&gt;s are used in &lt;em&gt;C&lt;/em&gt;:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Designated &lt;code&gt;char&lt;/code&gt;-variants&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Usage&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;br/&gt;&lt;code&gt;signed char&lt;/code&gt;, &lt;code&gt;unsigned char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;br/&gt;signed/unsigned number (arithmetic) &lt;br/&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;br/&gt;&lt;code&gt;unsigned char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;br/&gt;smallest uninterpreted unit of addressable memory&lt;sup id=&#34;fnref:7&#34;&gt;&lt;a href=&#34;#fn:7&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;7&lt;/a&gt;&lt;/sup&gt; &lt;br/&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;br/&gt;&lt;code&gt;char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;br/&gt;character in an encoded string &lt;br/&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Essentially, this extra type variant &lt;code&gt;char&lt;/code&gt; is intended to represent string data.
+Modern systems languages may have a fourth variant explicitly for uninterpreted memory access to help keep things clear.
+For example, in Golang, we have the following types:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Type&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Usage&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;uint8&lt;/code&gt;, &lt;code&gt;int8&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;signed/unsigned number (arithmetic)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;byte&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;alias for &lt;code&gt;uint8&lt;/code&gt; and smallest uninterpreted unit of addressable memory&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;rune&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;character in an encoded string&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Coming back to &lt;em&gt;C&lt;/em&gt;, note that other&lt;sup id=&#34;fnref:8&#34;&gt;&lt;a href=&#34;#fn:8&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;8&lt;/a&gt;&lt;/sup&gt; integer types can only be used for arithmetic purposes; they cannot be used &lt;em&gt;directly&lt;/em&gt; for representing strings&lt;sup id=&#34;fnref:9&#34;&gt;&lt;a href=&#34;#fn:9&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;9&lt;/a&gt;&lt;/sup&gt; or memory access&lt;sup id=&#34;fnref:10&#34;&gt;&lt;a href=&#34;#fn:10&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;10&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Signed Variant&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Unsigned Variant&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;short&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned short&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned int&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;long&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned long&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;long long&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned long long&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;default-argument-promotions&#34;&gt;Default Argument Promotions&lt;/h3&gt;
+&lt;p&gt;Before we can define how default argument promotions, we have to dive into the details of variadic functions.
+For brevity, we&amp;rsquo;ll skip some of the gory details; see &lt;a href=&#34;https://en.cppreference.com/w/c/variadic.html&#34;&gt;this cppreference page to get the full story&lt;/a&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;variadic-functions&#34;&gt;Variadic Functions&lt;/h4&gt;
+&lt;p&gt;According to the &lt;em&gt;C&lt;/em&gt; standard, variadic functions are declared by adding an ellipsis to the end of the formal parameter set.
+For example, the declaration:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;...)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;describes a function with:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;exactly one required parameter of type &lt;code&gt;const char*&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;zero or more &lt;em&gt;variadic parameters&lt;/em&gt; of unspecified type.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To work with variadic parameters, there are four macros that are generally used:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;va_list&lt;/code&gt; - is the type of a variadic parameter set&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;va_start(va_list, identifier)&lt;/code&gt; - initializes the variadic parameter set&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;va_arg(va_list, T)&lt;/code&gt; - returns the value of the next variadic parameter (which must be compatible&lt;sup id=&#34;fnref:11&#34;&gt;&lt;a href=&#34;#fn:11&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;11&lt;/a&gt;&lt;/sup&gt; with &lt;code&gt;T&lt;/code&gt; or else the result is undefined)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;va_end(va_list)&lt;/code&gt; - finalizes the variadic parameter set&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let&amp;rsquo;s see an example program below:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;stdarg.h&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;...)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;// declare the variable that stores the variadic parameter set
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;va_list&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;// initialize the variadic parameter set
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// the second argument should be the name of the last
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// non-variadic formal parameter; in this case, cnt
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;nf&#34;&gt;va_start&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cnt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;// return the value of the next variadic parameter
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// (in this case, it must be compatible with type int)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;elt&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;va_arg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;sum&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;elt&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;// finalize the variadic parameter set
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;nf&#34;&gt;va_end&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// should print:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// Sums were 15, 7, 0, 0
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum3&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum4&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Sums were %d, %d, %d, %d&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;There are some restrictions on the use of these macros; otherwise, the behavior of the program is undefined:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;the first argument to &lt;code&gt;va_start&lt;/code&gt;, &lt;code&gt;va_arg&lt;/code&gt;, and &lt;code&gt;va_end&lt;/code&gt; must have type &lt;code&gt;va_list&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;va_arg&lt;/code&gt; can only be called after (resp. before) a corresponding call to &lt;code&gt;va_start&lt;/code&gt; (resp. &lt;code&gt;va_end&lt;/code&gt;);&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;va_arg&lt;/code&gt; may not be called more than &lt;em&gt;n&lt;/em&gt; times, where &lt;em&gt;n&lt;/em&gt; is the number of variadic arguments;&lt;/li&gt;
+&lt;li&gt;if the _i_th call to has the form &lt;code&gt;va_arg(args, T)&lt;/code&gt;, then &lt;code&gt;T&lt;/code&gt; must be compatible with the &lt;em&gt;promoted type&lt;/em&gt; of the _i_th variadic argument;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This last point is the one we are interested in.&lt;/p&gt;
+&lt;h4 id=&#34;variadic-parameters-and-default-argument-promotions&#34;&gt;Variadic Parameters and Default Argument Promotions&lt;/h4&gt;
+&lt;p&gt;Consider the following call to &lt;code&gt;variadic_sum&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;first_arg&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;second_arg&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;2.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;first_arg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;second_arg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Is it well-defined?
+The answer is &lt;em&gt;no&lt;/em&gt;, because:&lt;/p&gt;
+&lt;p&gt;Since the first parameter &lt;code&gt;cnt == 2&lt;/code&gt;, the &lt;code&gt;va_arg&lt;/code&gt; macro will be called exactly twice, but&amp;hellip;
+on second call to &lt;code&gt;va_arg(args, int)&lt;/code&gt;, the second variadic parameter has the value &lt;code&gt;2.0&lt;/code&gt; which, as a floating point value, is &lt;em&gt;not&lt;/em&gt; compatible with type &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;But there is a missing detail here.
+When a programmer declares some function &lt;code&gt;f&lt;/code&gt;, for each normal function parameter &lt;code&gt;p&lt;/code&gt;, the programmer must specify its type &lt;code&gt;T&lt;/code&gt;.
+When compiling &lt;code&gt;f&lt;/code&gt;, for each such parameter &lt;code&gt;p&lt;/code&gt;, the compiler must allocate a chunk of memory &lt;code&gt;M&lt;/code&gt; (which may be a hardware register) that is large enough to store the value of &lt;code&gt;p&lt;/code&gt;.
+How does the compiler know if the chunk &lt;code&gt;M&lt;/code&gt; is large enough?
+It simply requires that &lt;code&gt;sizeof(M) &amp;gt;= sizeof(T)&lt;/code&gt;, that is to say, it consults the type &lt;code&gt;T&lt;/code&gt; of &lt;code&gt;p&lt;/code&gt; to determine its maximum size.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;But&lt;/em&gt;, when we declare a variadic function such as &lt;code&gt;int variadic_sum(unsigned int cnt, ...)&lt;/code&gt;, we aren&amp;rsquo;t told what the possible types of each variadic parameter might be.
+Essentially, we have two options:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Allocate a fixed size chunk &lt;code&gt;M&lt;/code&gt; that is large enough for &lt;em&gt;most&lt;/em&gt; values and either report a compiler error or permit undefined behavior if &lt;code&gt;sizeOf(T) &amp;gt; sizeof(M)&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Dynamically&lt;/em&gt; allocate a memory chunk &lt;code&gt;M&lt;/code&gt; to accept the parameter &lt;code&gt;T&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The C standard adopts the latter rule, but with a twist, i.e., it applies &lt;em&gt;default argument promotions&lt;/em&gt; to variadic arguments.
+Essentially, default argument promotions are a way reduce the number of possible cases to consider when dynamically allocating memory chunks &lt;code&gt;M&lt;/code&gt;.&lt;sup id=&#34;fnref:12&#34;&gt;&lt;a href=&#34;#fn:12&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;12&lt;/a&gt;&lt;/sup&gt;
+The rule breaks down into four cases which are applied in order:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;if a variadic argument has an arithmetic type and its range fits inside the range of type &lt;code&gt;int&lt;/code&gt;, it is upcasted to &lt;code&gt;int&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;otherwise, if it has arithmetic type and its range fits inside the range of type &lt;code&gt;unsigned int&lt;/code&gt;, it is upcasted to &lt;code&gt;unsigned int&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;otherwise, if it has type &lt;code&gt;float&lt;/code&gt;, it is upcasted to type &lt;code&gt;double&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;otherwise, its type is unchanged.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, coming back to our example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;first_arg&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;second_arg&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;2.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sum&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;variadic_sum&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;first_arg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;second_arg&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Due to the default argument promotion rule, on the second call to &lt;code&gt;va_arg(args, int)&lt;/code&gt;, the variadic parameter which binds value &lt;code&gt;second_arg&lt;/code&gt; actually has type &lt;code&gt;double&lt;/code&gt; (even though &lt;code&gt;second_arg&lt;/code&gt; has type &lt;code&gt;float&lt;/code&gt;).
+Since the type &lt;code&gt;double&lt;/code&gt; is not compatible with type &lt;code&gt;int&lt;/code&gt;, the behavior of this program is undefined.&lt;/p&gt;
+&lt;h3 id=&#34;signed-to-unsigned-integer-conversion&#34;&gt;Signed-to-Unsigned Integer Conversion&lt;/h3&gt;
+&lt;p&gt;This rule may be the simplest among those discussed above (especially for those familiar with modular arithmetic).
+Let&amp;rsquo;s recall the rule we saw above.&lt;/p&gt;
+&lt;p&gt;Given a signed integer value &lt;code&gt;i1&lt;/code&gt; of type &lt;code&gt;t1&lt;/code&gt; to be converted into unsigned type &lt;code&gt;t2&lt;/code&gt; with bit-width &lt;code&gt;b &amp;gt; 0&lt;/code&gt;, the process works as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If the &lt;code&gt;i1&lt;/code&gt; is within the range &lt;code&gt;[0,2^b)&lt;/code&gt;, then the result &lt;code&gt;i2 = i1&lt;/code&gt;;&lt;/li&gt;
+&lt;li&gt;Otherwise, the result is &lt;code&gt;i2 = i1 + x*2^b&lt;/code&gt; for the unique integer &lt;code&gt;x&lt;/code&gt; such that &lt;code&gt;0 &amp;lt;= i2 &amp;lt; 2^b&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Since this rule is fairly mechanical, we&amp;rsquo;ll just show some examples here.&lt;/p&gt;
+&lt;p&gt;For our examples, suppose we have a standard modern C platform where &lt;code&gt;CHAR_BIT == 8&lt;/code&gt; and &lt;code&gt;sizeof(int) == 4&lt;/code&gt; (i.e., each &lt;code&gt;int&lt;/code&gt; is 32 bits wide).
+Then the types below would have the following ranges:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Type&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Range&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;[-2^7,2^7)&lt;/code&gt; or &lt;code&gt;[-128,128)&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned char&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;[0, 2^8)&lt;/code&gt; or &lt;code&gt;[0, 256)&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;[-2^31,2^31)&lt;/code&gt; or &lt;code&gt;[-2147483648,2147483648)&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;unsigned int&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;[0, 2^32)&lt;/code&gt; or &lt;code&gt;[0, 4294967296)&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Recall that there is no &lt;code&gt;signed int&lt;/code&gt; type; &lt;code&gt;int&lt;/code&gt; is defined to be &lt;em&gt;signed&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Now let&amp;rsquo;s list a few &lt;code&gt;signed char/int&lt;/code&gt; to &lt;code&gt;unsigned char&lt;/code&gt; conversions:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Input Type&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Input&lt;/th&gt;
+&lt;th&gt;     &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Output&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-1&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;255&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-2&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;254&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;129&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;258&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;257&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;256&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;255&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;255&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;129&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-129&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-2147483648&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;And a few consider &lt;code&gt;signed char/int&lt;/code&gt; to &lt;code&gt;unsigned int&lt;/code&gt; conversions:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Input Type&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Input&lt;/th&gt;
+&lt;th&gt;     &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Output&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-1&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967295&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-2&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967294&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967169&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;signed char&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967168&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2147483648&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2147483648&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2147483647&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2147483647&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;128&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;127&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-1&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967295&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-2&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967294&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-127&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967169&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-128&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967168&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-129&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;4294967167&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int&lt;/code&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;-2147483648&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;&lt;code&gt;2147483648&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;I leave double-checking the results in this table as an exercise for the reader.&lt;/p&gt;
+&lt;p&gt;One important point to note from these rules is that the result of the conversion only depends on the input value and the output type; the input type is irrelevant.&lt;/p&gt;
+&lt;p&gt;(To the interested reader) I found the following questions useful to clarify how a machine might implement the conversions above:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Which conversions above (if any) preserve the bit-level representation of the input value (i.e., the input and output values are the exact same bit string)?&lt;/li&gt;
+&lt;li&gt;Which conversions above (if any) only modify the bit-level representation of the input value by adding/removing leading zeroes?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;putting-it-all-together&#34;&gt;Putting It All Together&lt;/h2&gt;
+&lt;p&gt;We now have enough details to piece together why our original program (copied below for your convenience) behaves the way it does.
+As above, let&amp;rsquo;s assume that we&amp;rsquo;re running this program on a standard x86-64 Linux box.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// requires bytes+0 to bytes+sz are valid memory addresses
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;print_hex&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;char&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;size_t&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;{&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// added for readability
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;unsigned&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sz&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;%02x&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;}&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// added for readability
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;For each call to &lt;code&gt;printf&lt;/code&gt; in the loop, the following type conversions are performed on the argument &lt;code&gt;bytes[i]&lt;/code&gt;:&lt;/p&gt;
+&lt;ol start=&#34;0&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Conversion Rule: N/A&lt;br&gt;
+Result Type: &lt;code&gt;char&lt;/code&gt;&lt;br&gt;
+Value Changed?: No&lt;/p&gt;
+&lt;p&gt;As we haven&amp;rsquo;t done any work at step 0, the type of &lt;code&gt;bytes[i]&lt;/code&gt; is still &lt;code&gt;char&lt;/code&gt;.
+But recall that on x86-64 Linux, &lt;code&gt;char&lt;/code&gt; is a &lt;em&gt;signed&lt;/em&gt; type!&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Conversion Rule: Default argument promotion&lt;br&gt;
+Result Type: &lt;code&gt;int&lt;/code&gt;&lt;br&gt;
+Value Changed?: No&lt;/p&gt;
+&lt;p&gt;By default argument promotion, we widen the type of &lt;code&gt;char&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.
+Note that, by definition of default argument promotion, the argument value never actually changes&amp;mdash;only its type does.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Conversion Rule: Signed-to-unsigned integer conversion&lt;br&gt;
+Result Type: &lt;code&gt;unsigned int&lt;/code&gt;&lt;br&gt;
+Value Changed?: Yes, but only when &lt;code&gt;byte[i] &amp;lt; 0&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;According to the definition of &lt;code&gt;printf&lt;/code&gt;, the conversion specification &lt;code&gt;%02x&lt;/code&gt; contains the base conversion &lt;code&gt;x&lt;/code&gt; which takes an &lt;code&gt;unsigned int&lt;/code&gt; argument and prints it as hexadecimal.
+This means &lt;code&gt;printf&lt;/code&gt; will take our casted argument &lt;code&gt;(int) byte[i]&lt;/code&gt; and cast it again to &lt;code&gt;unsigned int&lt;/code&gt; before printing in hexadecimal.
+Thus, we must apply the signed-to-unsigned integer conversion rule.
+However, recall that this rule &lt;em&gt;only&lt;/em&gt; depends on the input value and the output type.
+Since default argument promotion never changes the input value, when &lt;code&gt;byte[i] &amp;lt; 0&lt;/code&gt;, the result of the conversion will be defined by the equation below:&lt;/p&gt;
+&lt;p&gt;(†) &lt;code&gt;byte[i] + 1 * (2^32)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Of course, if &lt;code&gt;byte[i] &amp;gt;= 0&lt;/code&gt;, then the result will be unchanged, i.e., just &lt;code&gt;byte[i]&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, from this analysis, we observe that only the final conversion rule will change the value of the argument.
+But, to understand the precise output value obtained from equation (†) on our test vectors, we need to determine how the C platform will interpret the input &lt;code&gt;char*&lt;/code&gt; literal.
+To do this for our test vectors, we need to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;convert escape sequences into bit strings;&lt;/li&gt;
+&lt;li&gt;decode bit strings into decimal values using the two&amp;rsquo;s complement scheme.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To speed things along, I&amp;rsquo;ve gone ahead and interpreted the input values and then applied the conversion rules in the table below.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Test Vector&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Input Value&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Converted Value&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Output String&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;N/A&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;N/A&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\x00&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{00}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\x01&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{01}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\xff&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-1 + 2^32&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{ffffffff}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\xfe&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-2&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;-2 + 2^32&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{fffffffe}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Now, we can plainly see why the final two values printed such large output strings&amp;mdash;the converted value expressions contain an additional &lt;code&gt;2^32&lt;/code&gt; term!&lt;/p&gt;
+&lt;h3 id=&#34;so-what-now&#34;&gt;So What Now?&lt;/h3&gt;
+&lt;p&gt;We&amp;rsquo;ve finally identified the problem.
+How do we fix it?
+There are two basic solutions:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;em&gt;Change The Input Type&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;In our function &lt;code&gt;print_hex&lt;/code&gt;, we can change the type of &lt;code&gt;bytes&lt;/code&gt; from &lt;code&gt;char*&lt;/code&gt; to &lt;code&gt;unsigned char*&lt;/code&gt;.
+If we do that, firstly, the interpretation of &lt;code&gt;&amp;quot;\xff&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;\xfe&amp;quot;&lt;/code&gt; will change to 255 and 254 respectively.
+Then, default argument promotion will change the input type from &lt;code&gt;unsigned char&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;, but leave the value unchanged.
+Finally, the &lt;code&gt;x&lt;/code&gt; conversion specification will cast that value to &lt;code&gt;unsigned int&lt;/code&gt;, which, since the value is positive, also leaves it unchanged.
+Thus, the final value will be identical to the initial value.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;em&gt;Change The Conversion Specification Typesize&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;In this approach, we leave the type of input &lt;code&gt;bytes&lt;/code&gt; unchanged from &lt;code&gt;char*&lt;/code&gt; and instead rely on more advanced &lt;code&gt;printf&lt;/code&gt; features.
+As it turns out, the &lt;code&gt;printf&lt;/code&gt; function includes a wide variety of type size modifiers.
+If we change our &lt;code&gt;printf&lt;/code&gt; invocation to:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;%02hhx&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bytes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This will force &lt;code&gt;printf&lt;/code&gt; to cast input argument &lt;code&gt;byte[i]&lt;/code&gt; to type &lt;code&gt;unsigned char&lt;/code&gt;.
+And, if you manually apply the signed-to-unsigned conversion rules above, you will see that this gives us the intended result.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;After making either change, our program will behave as expected.
+That is, our test vectors will produce the following tables:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Test Vector&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Input Value&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;Converted Value&lt;/th&gt;
+&lt;th&gt;    &lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;Output String&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;N/A&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;N/A&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\x00&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{00}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\x01&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{01}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\xff&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255 (or) -1&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{ff}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;&amp;quot;\xfe&amp;quot;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;254 (or) -2&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;254&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;code&gt;{fe}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;So which of these solutions is best?&lt;/p&gt;
+&lt;p&gt;In my opinion, solution (1) is the clear winner, since it more properly communicates &lt;em&gt;intent&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;As I see it, the crux of this whole mess was a conflation of the &lt;code&gt;char&lt;/code&gt; and &lt;code&gt;unsigned char&lt;/code&gt; types and how they are used to represent strings &lt;em&gt;and&lt;/em&gt; uninterpreted memory regions.&lt;/p&gt;
+&lt;p&gt;In that light, assigning type &lt;code&gt;unsigned char*&lt;/code&gt; to &lt;code&gt;bytes&lt;/code&gt; clearly communicates that this value should be understood as a sequence of uninterpreted bytes (at least, on platforms where &lt;code&gt;CHAR_BIT == 8&lt;/code&gt;) as opposed to a string containing human language text.&lt;/p&gt;
+&lt;h2 id=&#34;epilogue&#34;&gt;Epilogue&lt;/h2&gt;
+&lt;p&gt;The convenience of C&amp;rsquo;s widely cloned &lt;code&gt;printf&lt;/code&gt; function belies the language&amp;rsquo;s truly low-level nature.
+Since at least the 1980&amp;rsquo;s, the C language has been referred to as a &amp;ldquo;portable assembly language,&amp;rdquo; and for good reason.
+When programming in C, to avoid unexpected pitfalls, one must be acutely aware of a whole slew of implicit behaviors (some of which are implementation-defined or even undefined).
+Otherwise, you too may find yourself falling into such a pit (as I did), dazed and confused, wondering how it ever got so dark.&lt;/p&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;Well, it &lt;em&gt;was&lt;/em&gt; a fairly recent event when I &lt;em&gt;started&lt;/em&gt; writing this blog post.
+However, my initial attempts to write this post fizzled out, and it sat dormant for the better part of a year before I finally mustered up the willpower to finish it.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
+&lt;p&gt;Unfortunately, by the time this post is published, I fear it will, in fact, be too long.&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34;&gt;
+&lt;p&gt;To the typed language enthusiast: even though the C language is incapable of enforcing the usage contract for this function, that doesn&amp;rsquo;t mean the contract doesn&amp;rsquo;t exist; at some point, when interfacing with real systems, we will encounter usage contracts which cannot be enforced (or even checked) in our language.&amp;#160;&lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:4&#34;&gt;
+&lt;p&gt;However, for all common operating systems (Linux, BSD/Mac, Windows) on all common CPU architectures, the printed text will match what was shown above.&amp;#160;&lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:5&#34;&gt;
+&lt;p&gt;To see that this is unique, a first hint is to observe that for any value in the range &lt;code&gt;[0,2^b)&lt;/code&gt;, adding or subtracting &lt;code&gt;2^b&lt;/code&gt; will produce a value outside of this range. If you want to go deeper, you can read about &lt;a href=&#34;https://en.wikipedia.org/wiki/Modular_arithmetic&#34;&gt;modular arithmetic&lt;/a&gt;.&amp;#160;&lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:6&#34;&gt;
+&lt;p&gt;Actually, I fudged the truth &lt;em&gt;slightly&lt;/em&gt;; the &lt;em&gt;C&lt;/em&gt; language doesn&amp;rsquo;t require &lt;code&gt;char&lt;/code&gt; variants to occupy exactly 8-bits;
+their bit width is defined as the value of the macro &lt;code&gt;CHAR_BIT&lt;/code&gt; where &lt;code&gt;CHAR_BIT &amp;gt;= 8&lt;/code&gt;.
+In fact, the &lt;code&gt;sizeof()&lt;/code&gt; operator in &lt;em&gt;C&lt;/em&gt; does &lt;em&gt;not&lt;/em&gt; return the number of &lt;em&gt;bytes&lt;/em&gt; that comprise an object, it returns the number of &lt;em&gt;chars&lt;/em&gt;,
+so that &lt;code&gt;sizeof(char) == 1&lt;/code&gt; regardless of architecture.
+In other words, on a platform where &lt;code&gt;CHAR_BIT != 8&lt;/code&gt;, manipulating values narrower than &lt;code&gt;CHAR_BIT&lt;/code&gt; may require bit-shifting, etc&amp;hellip;
+(just as we must do for 4-bit &lt;em&gt;nibbles&lt;/em&gt; when printing bytes as hexadecimal).&amp;#160;&lt;a href=&#34;#fnref:6&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:7&#34;&gt;
+&lt;p&gt;One may wonder why &lt;code&gt;unsigned char&lt;/code&gt; should be preferred as a unit of uninterpreted memory as opposed to the other character types.
+The main reasons are that (a) signed values have implementation-defined behavior when right-shifting &lt;code&gt;(&amp;gt;&amp;gt;)&lt;/code&gt;;
+(b) when widening a signed arithmetic type, C will perform sign extension, which differs from the normal semantics of memory accesses.&lt;br&gt;
+ &lt;br&gt;
+Similarly, one may wonder why the C standard sometimes prefers a pair of &lt;code&gt;void*&lt;/code&gt; and &lt;code&gt;size_t&lt;/code&gt; for representing a blob of memory instead of &lt;code&gt;unsigned char*&lt;/code&gt; and &lt;code&gt;size_t&lt;/code&gt;.
+Actually, both choices are sensible, but they signal a different intent.
+While an &lt;code&gt;unsigned char*&lt;/code&gt; represents a sequence of uninterpreted memory units (which are usually 8-bit bytes), a &lt;code&gt;void*&lt;/code&gt; represents a sequence of unknown type.
+As an example, we may use malloc to allocate memory for a &lt;code&gt;struct s { int a; int b; };&lt;/code&gt; by writing &lt;code&gt;malloc(sizeof(struct s))&lt;/code&gt; and it will return a &lt;code&gt;void*&lt;/code&gt;.
+We then think of that &lt;code&gt;void*&lt;/code&gt; as pointing to a &lt;em&gt;single&lt;/em&gt; object of type &lt;code&gt;s&lt;/code&gt;.
+If we cast that &lt;code&gt;void*&lt;/code&gt; to &lt;code&gt;unsigned char*&lt;/code&gt;, then that is like viewing an &lt;code&gt;s&lt;/code&gt; object as a raw sequence of uninterpreted memory units.&amp;#160;&lt;a href=&#34;#fnref:7&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:8&#34;&gt;
+&lt;p&gt;Again, I&amp;rsquo;m fudging the truth here a bit because there are other integer types, but we won&amp;rsquo;t discuss them here.&amp;#160;&lt;a href=&#34;#fnref:8&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:9&#34;&gt;
+&lt;p&gt;The fact that non-&lt;code&gt;char&lt;/code&gt; types cannot represent strings in C is a convention informed by the fact that original character sets used by computers in the United States had just 7 or 8 bits;
+This meant that each representable character on the machine could be stored in just &lt;em&gt;one&lt;/em&gt; &lt;code&gt;char&lt;/code&gt; value.
+However, as computers began to be developed and used globally, the number of bits required to encode a single language character expanded beyond just 7 or 8 bits.
+Unfortunately, at that point, it was not possible to change the meaning of the &lt;code&gt;char&lt;/code&gt; without breaking a large number of C programs.
+To remedy this issue, a wider &lt;code&gt;char&lt;/code&gt;-like type (appropriately called &lt;code&gt;wchar_t&lt;/code&gt;) was introduced to represent characters in languages that required more bits.&amp;#160;&lt;a href=&#34;#fnref:9&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:10&#34;&gt;
+&lt;p&gt;For the full story on why these integer types cannot be used for memory access, an interested reader can consult the C language &lt;a href=&#34;https://cppreference.com/w/c/language/object.html&#34;&gt;&lt;em&gt;aliasing&lt;/em&gt; rules&lt;/a&gt;.
+The key point is that, by restricting the use of these types to just arithmetic purposes, the compiler can apply certain optimizations that would otherwise not be possible.&amp;#160;&lt;a href=&#34;#fnref:10&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:11&#34;&gt;
+&lt;p&gt;The C language says types &lt;code&gt;T1&lt;/code&gt; and &lt;code&gt;T2&lt;/code&gt; are compatible if a value of one type can be used where the other type is expected.
+While there is some subtlety here in the actual definition, for our purposes, it&amp;rsquo;s enough to assume that &lt;code&gt;T1&lt;/code&gt; and &lt;code&gt;T2&lt;/code&gt; are the same type.&amp;#160;&lt;a href=&#34;#fnref:11&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:12&#34;&gt;
+&lt;p&gt;As far as I can tell, this rule was put in place to simplify the job of compiler writers.&amp;#160;&lt;a href=&#34;#fnref:12&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    
+    
+    <item>
       <title>Four Years and Beyond</title>
       <link>https://srs.fyi/four-years-and-beyond/</link>
       <pubDate>Tue, 17 Feb 2026 23:15:00 -0500</pubDate>

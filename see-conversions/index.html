@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stephen&#39;s Personal Blog">
+    
+    <link rel="shortcut icon" href="https://srs.fyi/favicon/favicon.ico">
+    <style>
+      mark { background-color: lightgray }
+    </style>
+
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>See Conversions</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://srs.fyi/">srs.fyi</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/" title="posts">posts</a>
+            </li><li>
+                <a href="/about/" title="about">about</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>See Conversions</h1>
+        <div>
+                <time>February 19, 2026</time>
+            </div>
+    </header><p>I recently<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> stumbled across an interesting C function.
+The function was quite simple&ndash;just a few lines long&mdash;so I was sure I understood it.
+And yet, the function produced unexpected results&mdash;and I could not understand why.
+Debugging this tiny function led me down the dark hole that is implicit type conversions in C.
+I have reproduced the function in its entirety below (with a 2-line modification to make the output more readable for this post).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>To avoid making this post too long<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, I assume the reader is familiar with <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal notation</a> and C language <a href="https://en.cppreference.com/w/c/language/escape.html">string escape sequences</a>.</p>
+<p>From first glance, we can see this this function will misbehave if the memory region argument is invalid.
+But if we do that, that&rsquo;s on us&mdash;we failed to respect the contract of this function.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
+<p>Here is a complete example program containing this function that applies it to a few test vectors.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span>     <span class="mi">0</span><span class="p">);</span> <span class="c1">// empty string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\x00</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; smallest possible byte value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\x01</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; smallest + 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\xff</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; largest possible byte value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\xfe</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; largest - 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>What text do you expect this function will print?
+To avoid confusion, let&rsquo;s assume we&rsquo;re running this program on a standard x86-64 Linux box.</p>
+<p>Take your time and think about it for a second.</p>
+<details>
+<summary>
+<u>If you need a hint, you can consult my mini-explainer of format strings by clicking here.</u>
+</summary>
+<p>An altogether-too-brief introduction to format strings:</p>
+<ul>
+<li>The <code>printf</code> family of functions all are designed to print formatted text to a buffer or file.</li>
+<li>Their first argument is always a <em>format string</em> that contains 0 or more <em>conversion specifications</em>.</li>
+<li>A <em>conversion specification</em> tells <code>printf</code> how to process a particular argument.</li>
+<li>If the <em>format string</em> has <em>N</em> conversion specifications, the <code>printf</code> call should have <em>N</em> arguments (excluding the format string itself).</li>
+</ul>
+<p><em>Example:</em></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">player</span> <span class="o">=</span> <span class="s">&#34;Bob&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">pts</span> <span class="o">=</span> <span class="mi">101</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%s scored %u point(s)!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">pts</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// prints: &#34;Bob scored 101 point(s)!&#34;
+</span></span></span></code></pre></div><p>Our example had two conversion specifications:</p>
+<ul>
+<li><code>%s</code> - which prints its corresponding argument as a string;</li>
+<li><code>%u</code> - which prints its corresponding argument as an unsigned <em>decimal</em> integer.</li>
+</ul>
+<p>In general, conversion specifications have the following structure:</p>
+<pre tabindex="0"><code>%[flags][width][precision][typesize]&lt;conversion&gt;
+</code></pre><p>where:</p>
+<ul>
+<li>a literal <code>%</code> symbol appears first;</li>
+<li>arguments in angle (resp. square) brackets are <em>required</em> (resp. <em>optional</em>).</li>
+</ul>
+<p>In our example program above, the conversion specification <code>%02x</code> can be parsed as follows:</p>
+<pre tabindex="0"><code>%02x
+|||`- converts argument to an `unsigned int` and prints as a hexadecimal
+||`-- minimum width 2 characters
+|`--- optional flag 0 --- pad result with leading zeroes
+`---- this symbol introduces a conversion specification
+</code></pre><p>So, to summarize, this conversion specification will:</p>
+<ol>
+<li><code>x</code> - convert its argument to an unsigned int and print as hexadecimal;</li>
+<li><code>2</code> - using a minimum of 2 characters;</li>
+<li><code>0</code> - where the padding character is a <code>0</code> instead of a space (<code> </code>).</li>
+</ol>
+</details>
+<br/>
+<details>
+<summary> <u>When you're ready, click here to see what text this program prints. </u> </summary>
+<code>
+{}<br/>
+{00}<br/>
+{01}<br/>
+{ffffffff}<br/>
+{fffffffe}<br/>
+</code>
+</details>
+<br/>
+Finally, if you want an explanation of this behavior, read on!
+<br/>
+<br/>
+<br/>
+<hr>
+<br/>
+<p>So, first things first: while the first two printed lines matched up with my expectations, the last two lines took me completely by surprise.
+At first glance, it looks like the last two function calls, intended to print out a <em>single byte</em>, somehow printed out <em>four</em> bytes.
+But how could that be?</p>
+<p>The ultimate explanation for this (unexpected to me) behavior boils down to the fact that the behavior of this C program is <em>implementation-defined</em>!<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup></p>
+<p>Why does this happen?
+This unusual behavior ultimately arises due to four interrelated factors:</p>
+<ol>
+<li>
+<p>Two&rsquo;s complement encoding</p>
+<p>All mainstream, modern, general-purpose computer architectures have a <em>binary</em> memory (i.e., the smallest unit of memory is either 0 or 1)
+and represent numbers in binary using the <a href="https://en.wikipedia.org/wiki/Two%27s_complement"><em>two&rsquo;s complement encoding</em></a>.</p>
+<p>Essentially, in this encoding, the most significant bit of a signed numeric type (called the <em>sign bit</em>) is <em>negated</em> while all other bits remain positive (like unsigned integers).</p>
+</li>
+<li>
+<p>The signedness of type <code>char</code></p>
+<p>While modern programmers may not think this way, the <em>C</em> language standard actually defines <em>multiple, distinct</em> <code>char</code> types with different signedness!</p>
+</li>
+<li>
+<p>Default argument promotions</p>
+<p>This mouthful of a phrase refers to a somewhat arcane corner of the <em>C</em> standard.
+When considering a variadic function,
+what <em>type</em> should its variadic parameters have in the function&rsquo;s body?</p>
+<p>For example, given variadic function <code>int printf(const char*, ...)</code>, suppose we make a function call
+<code>printf(&quot;%s scored %u point(s)!\n&quot;, player, pts)</code>.
+In the body of <code>printf</code>, what type should the formal parameter binding argument <code>player</code> take on?
+What about <code>pts</code>?</p>
+</li>
+<li>
+<p>Signed-to-Unsigned Integer Conversion</p>
+<p>Given a signed integer value <code>i1</code> of type <code>t1</code> to be converted into unsigned type <code>t2</code> with bit-width <code>b &gt; 0</code>, the process works as follows:</p>
+<ol>
+<li>If the <code>i1</code> is within the range <code>[0,2^b)</code>, then the result <code>i2 = i1</code>;</li>
+<li>Otherwise, the result is <code>i2 = i1 + x*2^b</code> for the unique<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup> integer <code>x</code> such that <code>0 &lt;= i2 &lt; 2^b</code>.</li>
+</ol>
+</li>
+</ol>
+<p>We&rsquo;ll discuss each of these factors in detail below.</p>
+<h3 id="twos-complement-encoding">Two&rsquo;s Complement Encoding</h3>
+<p>There isn&rsquo;t much more to say about this encoding that hasn&rsquo;t already been said.</p>
+<p>Thus, in this section, we&rsquo;ll focus on a small example:
+all 3 bit sequences written in a big-endian notation (i.e., with the most significant bit written first) and their two&rsquo;s complement values:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">Binary</th>
+<th>       </th>
+<th style="text-align:right">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><code>011</code></td>
+<td></td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>010</code></td>
+<td></td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>001</code></td>
+<td></td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>000</code></td>
+<td></td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>111</code></td>
+<td></td>
+<td style="text-align:right">-1</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>110</code></td>
+<td></td>
+<td style="text-align:right">-2</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>101</code></td>
+<td></td>
+<td style="text-align:right">-3</td>
+</tr>
+<tr>
+<td style="text-align:right"><code>100</code></td>
+<td></td>
+<td style="text-align:right">-4</td>
+</tr>
+</tbody>
+</table>
+<br/>
+<details>
+<summary> If this is all gibberish to you, you can read more here. </summary>
+<p>To understand these values, there are a few important things to note:</p>
+<ol>
+<li>Like I mentioned above, we <em>negate</em> the value of the first (leftmost) bit.</li>
+<li>Since this is a big-endian binary string, we label each bit position, starting from the <em>right</em>, as position 0, 1, 2, and so forth.</li>
+<li>Then the value of the bit <code>b</code> in position <code>i</code> is equal to <code>b * 2^i</code>.</li>
+<li>Finally, the value of an entire string is equal to the sum of values of each of its bits.</li>
+</ol>
+<p>Let&rsquo;s stick with 3 bit strings like we used in the table above.
+Given a 3-bit string <code>b2 b1 b0</code>, its value will be equal to:</p>
+<p><code>-(b2 * 2^2) + (b1 * 2^1) + (b0 * 2^0)</code></p>
+<p>Again, note that we negated the value of the most significant bit.</p>
+<p>Using this template, we&rsquo;ll work through one simple example.
+By applying this template to concrete bit string <code>100</code>, we obtain the expression:</p>
+<p><code>-(1 * 2^2) + (0 * 2^1) + (0 * 2^0)</code></p>
+<p>Simplifying the exponents, we get:</p>
+<p><code>-(1 * 4) + (0 * 2) + (0 * 1)</code></p>
+<p>Simplifying the multiplications gives:</p>
+<p><code>-(4) + (0) + (0)</code></p>
+<p>Finally, simplifying the additions gives <code>-4</code>, as we claimed in our table above.</p>
+</details>
+<h3 id="signedness-of-char">Signedness of <code>char</code></h3>
+<p>How many versions of <code>char</code> are there?
+In fact, there are <em>three</em>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Type</th>
+<th style="text-align:right">Numeric Range<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>unsigned char</code></td>
+<td style="text-align:right"><em>[0, 255]</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><em>[-128, 127]</em></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>char</code></td>
+<td style="text-align:right"><em>either [0, 255] or [-128, 127]</em></td>
+</tr>
+</tbody>
+</table>
+<p>However, on common platforms, the range of <code>char</code> and <code>signed char</code> have equal ranges.</p>
+<p>But why <em>three</em> separate <code>char</code> types?
+These various types map to <em>three</em> distinct ways that <code>char</code>s are used in <em>C</em>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Designated <code>char</code>-variants</th>
+<th style="text-align:left">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><br/><code>signed char</code>, <code>unsigned char</code></td>
+<td style="text-align:left"><br/>signed/unsigned number (arithmetic) <br/></td>
+</tr>
+<tr>
+<td style="text-align:left"><br/><code>unsigned char</code></td>
+<td style="text-align:left"><br/>smallest uninterpreted unit of addressable memory<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup> <br/></td>
+</tr>
+<tr>
+<td style="text-align:left"><br/><code>char</code></td>
+<td style="text-align:left"><br/>character in an encoded string <br/></td>
+</tr>
+</tbody>
+</table>
+<p>Essentially, this extra type variant <code>char</code> is intended to represent string data.
+Modern systems languages may have a fourth variant explicitly for uninterpreted memory access to help keep things clear.
+For example, in Golang, we have the following types:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Type</th>
+<th style="text-align:left">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>uint8</code>, <code>int8</code></td>
+<td style="text-align:left">signed/unsigned number (arithmetic)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>byte</code></td>
+<td style="text-align:left">alias for <code>uint8</code> and smallest uninterpreted unit of addressable memory</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>rune</code></td>
+<td style="text-align:left">character in an encoded string</td>
+</tr>
+</tbody>
+</table>
+<p>Coming back to <em>C</em>, note that other<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup> integer types can only be used for arithmetic purposes; they cannot be used <em>directly</em> for representing strings<sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup> or memory access<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Signed Variant</th>
+<th>    </th>
+<th style="text-align:left">Unsigned Variant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>short</code></td>
+<td></td>
+<td style="text-align:left"><code>unsigned short</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td></td>
+<td style="text-align:left"><code>unsigned int</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>long</code></td>
+<td></td>
+<td style="text-align:left"><code>unsigned long</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>long long</code></td>
+<td></td>
+<td style="text-align:left"><code>unsigned long long</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="default-argument-promotions">Default Argument Promotions</h3>
+<p>Before we can define how default argument promotions, we have to dive into the details of variadic functions.
+For brevity, we&rsquo;ll skip some of the gory details; see <a href="https://en.cppreference.com/w/c/variadic.html">this cppreference page to get the full story</a>.</p>
+<h4 id="variadic-functions">Variadic Functions</h4>
+<p>According to the <em>C</em> standard, variadic functions are declared by adding an ellipsis to the end of the formal parameter set.
+For example, the declaration:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">printf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="p">...)</span>
+</span></span></code></pre></div><p>describes a function with:</p>
+<ol>
+<li>exactly one required parameter of type <code>const char*</code>;</li>
+<li>zero or more <em>variadic parameters</em> of unspecified type.</li>
+</ol>
+<p>To work with variadic parameters, there are four macros that are generally used:</p>
+<ul>
+<li><code>va_list</code> - is the type of a variadic parameter set</li>
+<li><code>va_start(va_list, identifier)</code> - initializes the variadic parameter set</li>
+<li><code>va_arg(va_list, T)</code> - returns the value of the next variadic parameter (which must be compatible<sup id="fnref:11"><a href="#fn:11" class="footnote-ref" role="doc-noteref">11</a></sup> with <code>T</code> or else the result is undefined)</li>
+<li><code>va_end(va_list)</code> - finalizes the variadic parameter set</li>
+</ul>
+<p>Let&rsquo;s see an example program below:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdarg.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">cnt</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// declare the variable that stores the variadic parameter set
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">va_list</span> <span class="n">args</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// initialize the variadic parameter set
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// the second argument should be the name of the last
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// non-variadic formal parameter; in this case, cnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">va_start</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">cnt</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cnt</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// return the value of the next variadic parameter
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// (in this case, it must be compatible with type int)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">elt</span> <span class="o">=</span> <span class="nf">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">sum</span> <span class="o">+=</span> <span class="n">elt</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// finalize the variadic parameter set
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">va_end</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">sum</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// should print:
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Sums were 15, 7, 0, 0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum1</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum2</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum3</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum4</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Sums were %d, %d, %d, %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sum1</span><span class="p">,</span> <span class="n">sum2</span><span class="p">,</span> <span class="n">sum3</span><span class="p">,</span> <span class="n">sum4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>There are some restrictions on the use of these macros; otherwise, the behavior of the program is undefined:</p>
+<ol>
+<li>the first argument to <code>va_start</code>, <code>va_arg</code>, and <code>va_end</code> must have type <code>va_list</code>;</li>
+<li><code>va_arg</code> can only be called after (resp. before) a corresponding call to <code>va_start</code> (resp. <code>va_end</code>);</li>
+<li><code>va_arg</code> may not be called more than <em>n</em> times, where <em>n</em> is the number of variadic arguments;</li>
+<li>if the _i_th call to has the form <code>va_arg(args, T)</code>, then <code>T</code> must be compatible with the <em>promoted type</em> of the _i_th variadic argument;</li>
+</ol>
+<p>This last point is the one we are interested in.</p>
+<h4 id="variadic-parameters-and-default-argument-promotions">Variadic Parameters and Default Argument Promotions</h4>
+<p>Consider the following call to <code>variadic_sum</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">first_arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">second_arg</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">first_arg</span><span class="p">,</span> <span class="n">second_arg</span><span class="p">);</span>
+</span></span></code></pre></div><p>Is it well-defined?
+The answer is <em>no</em>, because:</p>
+<p>Since the first parameter <code>cnt == 2</code>, the <code>va_arg</code> macro will be called exactly twice, but&hellip;
+on second call to <code>va_arg(args, int)</code>, the second variadic parameter has the value <code>2.0</code> which, as a floating point value, is <em>not</em> compatible with type <code>int</code>.</p>
+<p>But there is a missing detail here.
+When a programmer declares some function <code>f</code>, for each normal function parameter <code>p</code>, the programmer must specify its type <code>T</code>.
+When compiling <code>f</code>, for each such parameter <code>p</code>, the compiler must allocate a chunk of memory <code>M</code> (which may be a hardware register) that is large enough to store the value of <code>p</code>.
+How does the compiler know if the chunk <code>M</code> is large enough?
+It simply requires that <code>sizeof(M) &gt;= sizeof(T)</code>, that is to say, it consults the type <code>T</code> of <code>p</code> to determine its maximum size.</p>
+<p><em>But</em>, when we declare a variadic function such as <code>int variadic_sum(unsigned int cnt, ...)</code>, we aren&rsquo;t told what the possible types of each variadic parameter might be.
+Essentially, we have two options:</p>
+<ol>
+<li>Allocate a fixed size chunk <code>M</code> that is large enough for <em>most</em> values and either report a compiler error or permit undefined behavior if <code>sizeOf(T) &gt; sizeof(M)</code>;</li>
+<li><em>Dynamically</em> allocate a memory chunk <code>M</code> to accept the parameter <code>T</code>.</li>
+</ol>
+<p>The C standard adopts the latter rule, but with a twist, i.e., it applies <em>default argument promotions</em> to variadic arguments.
+Essentially, default argument promotions are a way reduce the number of possible cases to consider when dynamically allocating memory chunks <code>M</code>.<sup id="fnref:12"><a href="#fn:12" class="footnote-ref" role="doc-noteref">12</a></sup>
+The rule breaks down into four cases which are applied in order:</p>
+<ol>
+<li>if a variadic argument has an arithmetic type and its range fits inside the range of type <code>int</code>, it is upcasted to <code>int</code>;</li>
+<li>otherwise, if it has arithmetic type and its range fits inside the range of type <code>unsigned int</code>, it is upcasted to <code>unsigned int</code>;</li>
+<li>otherwise, if it has type <code>float</code>, it is upcasted to type <code>double</code>;</li>
+<li>otherwise, its type is unchanged.</li>
+</ol>
+<p>So, coming back to our example:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">first_arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">second_arg</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">first_arg</span><span class="p">,</span> <span class="n">second_arg</span><span class="p">);</span>
+</span></span></code></pre></div><p>Due to the default argument promotion rule, on the second call to <code>va_arg(args, int)</code>, the variadic parameter which binds value <code>second_arg</code> actually has type <code>double</code> (even though <code>second_arg</code> has type <code>float</code>).
+Since the type <code>double</code> is not compatible with type <code>int</code>, the behavior of this program is undefined.</p>
+<h3 id="signed-to-unsigned-integer-conversion">Signed-to-Unsigned Integer Conversion</h3>
+<p>This rule may be the simplest among those discussed above (especially for those familiar with modular arithmetic).
+Let&rsquo;s recall the rule we saw above.</p>
+<p>Given a signed integer value <code>i1</code> of type <code>t1</code> to be converted into unsigned type <code>t2</code> with bit-width <code>b &gt; 0</code>, the process works as follows:</p>
+<ol>
+<li>If the <code>i1</code> is within the range <code>[0,2^b)</code>, then the result <code>i2 = i1</code>;</li>
+<li>Otherwise, the result is <code>i2 = i1 + x*2^b</code> for the unique integer <code>x</code> such that <code>0 &lt;= i2 &lt; 2^b</code>.</li>
+</ol>
+<p>Since this rule is fairly mechanical, we&rsquo;ll just show some examples here.</p>
+<p>For our examples, suppose we have a standard modern C platform where <code>CHAR_BIT == 8</code> and <code>sizeof(int) == 4</code> (i.e., each <code>int</code> is 32 bits wide).
+Then the types below would have the following ranges:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Type</th>
+<th>    </th>
+<th style="text-align:left">Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td></td>
+<td style="text-align:left"><code>[-2^7,2^7)</code> or <code>[-128,128)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>unsigned char</code></td>
+<td></td>
+<td style="text-align:left"><code>[0, 2^8)</code> or <code>[0, 256)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td></td>
+<td style="text-align:left"><code>[-2^31,2^31)</code> or <code>[-2147483648,2147483648)</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>unsigned int</code></td>
+<td></td>
+<td style="text-align:left"><code>[0, 2^32)</code> or <code>[0, 4294967296)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Recall that there is no <code>signed int</code> type; <code>int</code> is defined to be <em>signed</em>.</p>
+<p>Now let&rsquo;s list a few <code>signed char/int</code> to <code>unsigned char</code> conversions:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Input Type</th>
+<th style="text-align:right">Input</th>
+<th>     </th>
+<th style="text-align:right">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>128</code></td>
+<td></td>
+<td style="text-align:right"><code>128</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>127</code></td>
+<td></td>
+<td style="text-align:right"><code>127</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>2</code></td>
+<td></td>
+<td style="text-align:right"><code>2</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>1</code></td>
+<td></td>
+<td style="text-align:right"><code>1</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>0</code></td>
+<td></td>
+<td style="text-align:right"><code>0</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>-1</code></td>
+<td></td>
+<td style="text-align:right"><code>255</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>-2</code></td>
+<td></td>
+<td style="text-align:right"><code>254</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>-127</code></td>
+<td></td>
+<td style="text-align:right"><code>129</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>signed char</code></td>
+<td style="text-align:right"><code>-128</code></td>
+<td></td>
+<td style="text-align:right"><code>128</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>258</code></td>
+<td></td>
+<td style="text-align:right"><code>2</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>257</code></td>
+<td></td>
+<td style="text-align:right"><code>1</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>256</code></td>
+<td></td>
+<td style="text-align:right"><code>0</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>255</code></td>
+<td></td>
+<td style="text-align:right"><code>255</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>-127</code></td>
+<td></td>
+<td style="text-align:right"><code>129</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>-128</code></td>
+<td></td>
+<td style="text-align:right"><code>128</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>-129</code></td>
+<td></td>
+<td style="text-align:right"><code>127</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>int</code></td>
+<td style="text-align:right"><code>-2147483648</code></td>
+<td></td>
+<td style="text-align:right"><code>0</code></td>
+</tr>
+</tbody>
+</table>
+<p>And a few consider <code>signed char/int</code> to <code>unsigned int</code> conversions:</p>
+<table>
+<thead>
+<tr>
+<th>Input Type</th>
+<th style="text-align:right">Input</th>
+<th>     </th>
+<th style="text-align:right">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>128</code></td>
+<td></td>
+<td style="text-align:right"><code>128</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>127</code></td>
+<td></td>
+<td style="text-align:right"><code>127</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>2</code></td>
+<td></td>
+<td style="text-align:right"><code>2</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>1</code></td>
+<td></td>
+<td style="text-align:right"><code>1</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>0</code></td>
+<td></td>
+<td style="text-align:right"><code>0</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>-1</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967295</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>-2</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967294</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>-127</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967169</code></td>
+</tr>
+<tr>
+<td><code>signed char</code></td>
+<td style="text-align:right"><code>-128</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967168</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>2147483648</code></td>
+<td></td>
+<td style="text-align:right"><code>2147483648</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>2147483647</code></td>
+<td></td>
+<td style="text-align:right"><code>2147483647</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>128</code></td>
+<td></td>
+<td style="text-align:right"><code>128</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>127</code></td>
+<td></td>
+<td style="text-align:right"><code>127</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>2</code></td>
+<td></td>
+<td style="text-align:right"><code>2</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>1</code></td>
+<td></td>
+<td style="text-align:right"><code>1</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>0</code></td>
+<td></td>
+<td style="text-align:right"><code>0</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>-1</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967295</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>-2</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967294</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>-127</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967169</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>-128</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967168</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>-129</code></td>
+<td></td>
+<td style="text-align:right"><code>4294967167</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td style="text-align:right"><code>-2147483648</code></td>
+<td></td>
+<td style="text-align:right"><code>2147483648</code></td>
+</tr>
+</tbody>
+</table>
+<p>I leave double-checking the results in this table as an exercise for the reader.</p>
+<p>One important point to note from these rules is that the result of the conversion only depends on the input value and the output type; the input type is irrelevant.</p>
+<p>(To the interested reader) I found the following questions useful to clarify how a machine might implement the conversions above:</p>
+<ol>
+<li>Which conversions above (if any) preserve the bit-level representation of the input value (i.e., the input and output values are the exact same bit string)?</li>
+<li>Which conversions above (if any) only modify the bit-level representation of the input value by adding/removing leading zeroes?</li>
+</ol>
+<h2 id="putting-it-all-together">Putting It All Together</h2>
+<p>We now have enough details to piece together why our original program (copied below for your convenience) behaves the way it does.
+As above, let&rsquo;s assume that we&rsquo;re running this program on a standard x86-64 Linux box.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>For each call to <code>printf</code> in the loop, the following type conversions are performed on the argument <code>bytes[i]</code>:</p>
+<ol start="0">
+<li>
+<p>Conversion Rule: N/A<br>
+Result Type: <code>char</code><br>
+Value Changed?: No</p>
+<p>As we haven&rsquo;t done any work at step 0, the type of <code>bytes[i]</code> is still <code>char</code>.
+But recall that on x86-64 Linux, <code>char</code> is a <em>signed</em> type!</p>
+</li>
+<li>
+<p>Conversion Rule: Default argument promotion<br>
+Result Type: <code>int</code><br>
+Value Changed?: No</p>
+<p>By default argument promotion, we widen the type of <code>char</code> to <code>int</code>.
+Note that, by definition of default argument promotion, the argument value never actually changes&mdash;only its type does.</p>
+</li>
+<li>
+<p>Conversion Rule: Signed-to-unsigned integer conversion<br>
+Result Type: <code>unsigned int</code><br>
+Value Changed?: Yes, but only when <code>byte[i] &lt; 0</code></p>
+<p>According to the definition of <code>printf</code>, the conversion specification <code>%02x</code> contains the base conversion <code>x</code> which takes an <code>unsigned int</code> argument and prints it as hexadecimal.
+This means <code>printf</code> will take our casted argument <code>(int) byte[i]</code> and cast it again to <code>unsigned int</code> before printing in hexadecimal.
+Thus, we must apply the signed-to-unsigned integer conversion rule.
+However, recall that this rule <em>only</em> depends on the input value and the output type.
+Since default argument promotion never changes the input value, when <code>byte[i] &lt; 0</code>, the result of the conversion will be defined by the equation below:</p>
+<p>(†) <code>byte[i] + 1 * (2^32)</code></p>
+<p>Of course, if <code>byte[i] &gt;= 0</code>, then the result will be unchanged, i.e., just <code>byte[i]</code>.</p>
+</li>
+</ol>
+<p>So, from this analysis, we observe that only the final conversion rule will change the value of the argument.
+But, to understand the precise output value obtained from equation (†) on our test vectors, we need to determine how the C platform will interpret the input <code>char*</code> literal.
+To do this for our test vectors, we need to:</p>
+<ol>
+<li>convert escape sequences into bit strings;</li>
+<li>decode bit strings into decimal values using the two&rsquo;s complement scheme.</li>
+</ol>
+<p>To speed things along, I&rsquo;ve gone ahead and interpreted the input values and then applied the conversion rules in the table below.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Test Vector</th>
+<th>    </th>
+<th style="text-align:right">Input Value</th>
+<th>    </th>
+<th style="text-align:right">Converted Value</th>
+<th>    </th>
+<th style="text-align:left">Output String</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;&quot;</code></td>
+<td></td>
+<td style="text-align:right">N/A</td>
+<td></td>
+<td style="text-align:right">N/A</td>
+<td></td>
+<td style="text-align:left"><code>{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\x00&quot;</code></td>
+<td></td>
+<td style="text-align:right">0</td>
+<td></td>
+<td style="text-align:right">0</td>
+<td></td>
+<td style="text-align:left"><code>{00}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\x01&quot;</code></td>
+<td></td>
+<td style="text-align:right">1</td>
+<td></td>
+<td style="text-align:right">1</td>
+<td></td>
+<td style="text-align:left"><code>{01}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\xff&quot;</code></td>
+<td></td>
+<td style="text-align:right">-1</td>
+<td></td>
+<td style="text-align:right">-1 + 2^32</td>
+<td></td>
+<td style="text-align:left"><code>{ffffffff}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\xfe&quot;</code></td>
+<td></td>
+<td style="text-align:right">-2</td>
+<td></td>
+<td style="text-align:right">-2 + 2^32</td>
+<td></td>
+<td style="text-align:left"><code>{fffffffe}</code></td>
+</tr>
+</tbody>
+</table>
+<p>Now, we can plainly see why the final two values printed such large output strings&mdash;the converted value expressions contain an additional <code>2^32</code> term!</p>
+<h3 id="so-what-now">So What Now?</h3>
+<p>We&rsquo;ve finally identified the problem.
+How do we fix it?
+There are two basic solutions:</p>
+<ol>
+<li>
+<p><em>Change The Input Type</em></p>
+<p>In our function <code>print_hex</code>, we can change the type of <code>bytes</code> from <code>char*</code> to <code>unsigned char*</code>.
+If we do that, firstly, the interpretation of <code>&quot;\xff&quot;</code> and <code>&quot;\xfe&quot;</code> will change to 255 and 254 respectively.
+Then, default argument promotion will change the input type from <code>unsigned char</code> to <code>int</code>, but leave the value unchanged.
+Finally, the <code>x</code> conversion specification will cast that value to <code>unsigned int</code>, which, since the value is positive, also leaves it unchanged.
+Thus, the final value will be identical to the initial value.</p>
+</li>
+<li>
+<p><em>Change The Conversion Specification Typesize</em></p>
+<p>In this approach, we leave the type of input <code>bytes</code> unchanged from <code>char*</code> and instead rely on more advanced <code>printf</code> features.
+As it turns out, the <code>printf</code> function includes a wide variety of type size modifiers.
+If we change our <code>printf</code> invocation to:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02hhx&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span></code></pre></div><p>This will force <code>printf</code> to cast input argument <code>byte[i]</code> to type <code>unsigned char</code>.
+And, if you manually apply the signed-to-unsigned conversion rules above, you will see that this gives us the intended result.</p>
+</li>
+</ol>
+<p>After making either change, our program will behave as expected.
+That is, our test vectors will produce the following tables:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Test Vector</th>
+<th>    </th>
+<th style="text-align:right">Input Value</th>
+<th>    </th>
+<th style="text-align:right">Converted Value</th>
+<th>    </th>
+<th style="text-align:left">Output String</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>&quot;&quot;</code></td>
+<td></td>
+<td style="text-align:right">N/A</td>
+<td></td>
+<td style="text-align:right">N/A</td>
+<td></td>
+<td style="text-align:left"><code>{}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\x00&quot;</code></td>
+<td></td>
+<td style="text-align:right">0</td>
+<td></td>
+<td style="text-align:right">0</td>
+<td></td>
+<td style="text-align:left"><code>{00}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\x01&quot;</code></td>
+<td></td>
+<td style="text-align:right">1</td>
+<td></td>
+<td style="text-align:right">1</td>
+<td></td>
+<td style="text-align:left"><code>{01}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\xff&quot;</code></td>
+<td></td>
+<td style="text-align:right">255 (or) -1</td>
+<td></td>
+<td style="text-align:right">255</td>
+<td></td>
+<td style="text-align:left"><code>{ff}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>&quot;\xfe&quot;</code></td>
+<td></td>
+<td style="text-align:right">254 (or) -2</td>
+<td></td>
+<td style="text-align:right">254</td>
+<td></td>
+<td style="text-align:left"><code>{fe}</code></td>
+</tr>
+</tbody>
+</table>
+<p>So which of these solutions is best?</p>
+<p>In my opinion, solution (1) is the clear winner, since it more properly communicates <em>intent</em>.</p>
+<p>As I see it, the crux of this whole mess was a conflation of the <code>char</code> and <code>unsigned char</code> types and how they are used to represent strings <em>and</em> uninterpreted memory regions.</p>
+<p>In that light, assigning type <code>unsigned char*</code> to <code>bytes</code> clearly communicates that this value should be understood as a sequence of uninterpreted bytes (at least, on platforms where <code>CHAR_BIT == 8</code>) as opposed to a string containing human language text.</p>
+<h2 id="epilogue">Epilogue</h2>
+<p>The convenience of C&rsquo;s widely cloned <code>printf</code> function belies the language&rsquo;s truly low-level nature.
+Since at least the 1980&rsquo;s, the C language has been referred to as a &ldquo;portable assembly language,&rdquo; and for good reason.
+When programming in C, to avoid unexpected pitfalls, one must be acutely aware of a whole slew of implicit behaviors (some of which are implementation-defined or even undefined).
+Otherwise, you too may find yourself falling into such a pit (as I did), dazed and confused, wondering how it ever got so dark.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Well, it <em>was</em> a fairly recent event when I <em>started</em> writing this blog post.
+However, my initial attempts to write this post fizzled out, and it sat dormant for the better part of a year before I finally mustered up the willpower to finish it.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>Unfortunately, by the time this post is published, I fear it will, in fact, be too long.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>To the typed language enthusiast: even though the C language is incapable of enforcing the usage contract for this function, that doesn&rsquo;t mean the contract doesn&rsquo;t exist; at some point, when interfacing with real systems, we will encounter usage contracts which cannot be enforced (or even checked) in our language.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>However, for all common operating systems (Linux, BSD/Mac, Windows) on all common CPU architectures, the printed text will match what was shown above.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>To see that this is unique, a first hint is to observe that for any value in the range <code>[0,2^b)</code>, adding or subtracting <code>2^b</code> will produce a value outside of this range. If you want to go deeper, you can read about <a href="https://en.wikipedia.org/wiki/Modular_arithmetic">modular arithmetic</a>.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>Actually, I fudged the truth <em>slightly</em>; the <em>C</em> language doesn&rsquo;t require <code>char</code> variants to occupy exactly 8-bits;
+their bit width is defined as the value of the macro <code>CHAR_BIT</code> where <code>CHAR_BIT &gt;= 8</code>.
+In fact, the <code>sizeof()</code> operator in <em>C</em> does <em>not</em> return the number of <em>bytes</em> that comprise an object, it returns the number of <em>chars</em>,
+so that <code>sizeof(char) == 1</code> regardless of architecture.
+In other words, on a platform where <code>CHAR_BIT != 8</code>, manipulating values narrower than <code>CHAR_BIT</code> may require bit-shifting, etc&hellip;
+(just as we must do for 4-bit <em>nibbles</em> when printing bytes as hexadecimal).&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>One may wonder why <code>unsigned char</code> should be preferred as a unit of uninterpreted memory as opposed to the other character types.
+The main reasons are that (a) signed values have implementation-defined behavior when right-shifting <code>(&gt;&gt;)</code>;
+(b) when widening a signed arithmetic type, C will perform sign extension, which differs from the normal semantics of memory accesses.<br>
+ <br>
+Similarly, one may wonder why the C standard sometimes prefers a pair of <code>void*</code> and <code>size_t</code> for representing a blob of memory instead of <code>unsigned char*</code> and <code>size_t</code>.
+Actually, both choices are sensible, but they signal a different intent.
+While an <code>unsigned char*</code> represents a sequence of uninterpreted memory units (which are usually 8-bit bytes), a <code>void*</code> represents a sequence of unknown type.
+As an example, we may use malloc to allocate memory for a <code>struct s { int a; int b; };</code> by writing <code>malloc(sizeof(struct s))</code> and it will return a <code>void*</code>.
+We then think of that <code>void*</code> as pointing to a <em>single</em> object of type <code>s</code>.
+If we cast that <code>void*</code> to <code>unsigned char*</code>, then that is like viewing an <code>s</code> object as a raw sequence of uninterpreted memory units.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8">
+<p>Again, I&rsquo;m fudging the truth here a bit because there are other integer types, but we won&rsquo;t discuss them here.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:9">
+<p>The fact that non-<code>char</code> types cannot represent strings in C is a convention informed by the fact that original character sets used by computers in the United States had just 7 or 8 bits;
+This meant that each representable character on the machine could be stored in just <em>one</em> <code>char</code> value.
+However, as computers began to be developed and used globally, the number of bits required to encode a single language character expanded beyond just 7 or 8 bits.
+Unfortunately, at that point, it was not possible to change the meaning of the <code>char</code> without breaking a large number of C programs.
+To remedy this issue, a wider <code>char</code>-like type (appropriately called <code>wchar_t</code>) was introduced to represent characters in languages that required more bits.&#160;<a href="#fnref:9" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:10">
+<p>For the full story on why these integer types cannot be used for memory access, an interested reader can consult the C language <a href="https://cppreference.com/w/c/language/object.html"><em>aliasing</em> rules</a>.
+The key point is that, by restricting the use of these types to just arithmetic purposes, the compiler can apply certain optimizations that would otherwise not be possible.&#160;<a href="#fnref:10" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:11">
+<p>The C language says types <code>T1</code> and <code>T2</code> are compatible if a value of one type can be used where the other type is expected.
+While there is some subtlety here in the actual definition, for our purposes, it&rsquo;s enough to assume that <code>T1</code> and <code>T2</code> are the same type.&#160;<a href="#fnref:11" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:12">
+<p>As far as I can tell, this rule was put in place to simplify the job of compiler writers.&#160;<a href="#fnref:12" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+</article>
+
+        </main><footer id="footer">
+    Copyright © 2026 Stephen Skeirik
+</footer>
+</body>
+</html>
