@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
-		<title>Home on srs.fyi</title>
-		<link>https://srs.fyi/</link>
-		<description>Recent content in Home on srs.fyi</description>
+		<title>Blog on srs.fyi</title>
+		<link>https://srs.fyi/blog/</link>
+		<description>Recent content in Blog on srs.fyi</description>
 		<generator>Hugo</generator>
 		<language>en</language>
 		
@@ -14,14 +14,7 @@
 		
 			<lastBuildDate>Thu, 19 Feb 2026 22:57:00 -0400</lastBuildDate>
 		
-			<atom:link href="https://srs.fyi/index.xml" rel="self" type="application/rss+xml" />
-			<item>
-				<title>About</title>
-				<link>https://srs.fyi/about/</link>
-				<pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-				<guid>https://srs.fyi/about/</guid>
-				<description>&lt;p&gt;Hi, I&amp;rsquo;m Stephen!&lt;/p&gt;&#xA;&lt;p&gt;Professionally, I apply practical formal methods to help teams build and secure systems.&lt;/p&gt;&#xA;&lt;p&gt;Personally, I am a Christ-follower, husband, father, and all-around nerd.&lt;/p&gt;&#xA;&lt;h2 id=&#34;career--education&#34;&gt;Career &amp;amp; Education&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;2026-Present - &lt;em&gt;Computer Engineer&lt;/em&gt;  - &lt;em&gt;Oak Ridge National Laboratory&lt;/em&gt;&lt;/li&gt;&#xA;&lt;li&gt;2024-2026 - &lt;em&gt;Software Engineer&lt;/em&gt; - &lt;em&gt;Pi Squared Inc.&lt;/em&gt;&lt;/li&gt;&#xA;&lt;li&gt;2019-2024 - &lt;em&gt;Formal Verification Engineer&lt;/em&gt; - &lt;em&gt;Runtime Verification Inc.&lt;/em&gt;&lt;/li&gt;&#xA;&lt;li&gt;2012-2019 - &lt;em&gt;Ph.D. Computer Science&lt;/em&gt; - &lt;em&gt;University of Illinois at Urbana-Champaign&lt;/em&gt;&lt;/li&gt;&#xA;&lt;li&gt;2008-2012 - &lt;em&gt;B.S. Computer Science&lt;/em&gt; - &lt;em&gt;University of Tennessee Knoxville&lt;/em&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;interests&#34;&gt;Interests&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Mathematical logic&lt;/li&gt;&#xA;&lt;li&gt;Programming languages&lt;/li&gt;&#xA;&lt;li&gt;Languages and linguistics&lt;/li&gt;&#xA;&lt;li&gt;Human development&lt;/li&gt;&#xA;&lt;li&gt;Retro-platformer video games&lt;/li&gt;&#xA;&lt;li&gt;Writing and storytelling&lt;/li&gt;&#xA;&lt;li&gt;Travel (13 countries and counting!)&lt;/li&gt;&#xA;&lt;li&gt;Coffee&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;colophon&#34;&gt;Colophon&lt;/h2&gt;&#xA;&lt;h3 id=&#34;credits&#34;&gt;Credits&lt;/h3&gt;&#xA;&lt;p&gt;This webpage is built using the following freely available resources below. Thank you!&lt;/p&gt;</description>
-			</item>
+			<atom:link href="https://srs.fyi/blog/index.xml" rel="self" type="application/rss+xml" />
 			<item>
 				<title>See Conversions</title>
 				<link>https://srs.fyi/see-conversions/</link>

@@ -1,37 +1,236 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Stephen&#39;s Personal Blog">
-    
-    <link rel="shortcut icon" href="https://srs.fyi/favicon/favicon.ico">
-    <style>
-      mark { background-color: lightgray }
-    </style>
-    <link rel="stylesheet" href="/css/style.min.css">
+<html lang="en">
 
-    <title>Learning Haskell</title>
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="https://srs.fyi/favicon/light/favicon-32x32.png" />
+<title>Learning Haskell | srs.fyi</title>
+<meta name="title" content="Learning Haskell" />
+<meta name="description" content="TLDR: In this blog post, I list some of the challenges that I faced while learning Haskell.
+Skip down to Challenges to see my list.
+My journey to Haskell dates back to the start of my university days.
+I first heard about Haskell from an older grad student I worked with.
+He was an opinionated man with an impressively long beard who rolled his own cigarettes and often took smoke breaks just outside the department building.
+Haskell was a challenging and mind-bending language, he promised, as a puff of smoke wafted into the air." />
+<meta name="keywords" content="" />
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+<style>
+@media (prefers-color-scheme: light) {
+.bg{color:#272822;background-color:#fafafa}.chroma{color:#272822;background-color:#fafafa;-webkit-text-size-adjust:none}.chroma .err{color:#960050;background-color:#1e0010}.chroma .lnlinks{outline:none;text-decoration:none;color:inherit}.chroma .lntd{vertical-align:top;padding:0;margin:0;border:0}.chroma .lntable{border-spacing:0;padding:0;margin:0;border:0}.chroma .hl{background-color:#e1e1e1}.chroma .lnt{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .ln{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .line{display:flex}.chroma .k{color:#00a8c8}.chroma .kc{color:#00a8c8}.chroma .kd{color:#00a8c8}.chroma .kn{color:#f92672}.chroma .kp{color:#00a8c8}.chroma .kr{color:#00a8c8}.chroma .kt{color:#00a8c8}.chroma .n{color:#111}.chroma .na{color:#75af00}.chroma .nc{color:#75af00}.chroma .no{color:#00a8c8}.chroma .nd{color:#75af00}.chroma .ni{color:#111}.chroma .ne{color:#75af00}.chroma .nl{color:#111}.chroma .nn{color:#111}.chroma .nx{color:#75af00}.chroma .py{color:#111}.chroma .nt{color:#f92672}.chroma .nb{color:#111}.chroma .bp{color:#111}.chroma .nv{color:#111}.chroma .vc{color:#111}.chroma .vg{color:#111}.chroma .vi{color:#111}.chroma .vm{color:#111}.chroma .nf{color:#75af00}.chroma .fm{color:#75af00}.chroma .l{color:#ae81ff}.chroma .ld{color:#d88200}.chroma .s{color:#d88200}.chroma .sa{color:#d88200}.chroma .sb{color:#d88200}.chroma .sc{color:#d88200}.chroma .dl{color:#d88200}.chroma .sd{color:#d88200}.chroma .s2{color:#d88200}.chroma .se{color:#8045ff}.chroma .sh{color:#d88200}.chroma .si{color:#d88200}.chroma .sx{color:#d88200}.chroma .sr{color:#d88200}.chroma .s1{color:#d88200}.chroma .ss{color:#d88200}.chroma .m{color:#ae81ff}.chroma .mb{color:#ae81ff}.chroma .mf{color:#ae81ff}.chroma .mh{color:#ae81ff}.chroma .mi{color:#ae81ff}.chroma .il{color:#ae81ff}.chroma .mo{color:#ae81ff}.chroma .o{color:#f92672}.chroma .ow{color:#f92672}.chroma .or{color:#f92672}.chroma .p{color:#111}.chroma .c{color:#75715e}.chroma .ch{color:#75715e}.chroma .cm{color:#75715e}.chroma .c1{color:#75715e}.chroma .cs{color:#75715e}.chroma .cp{color:#75715e}.chroma .cpf{color:#75715e}.chroma .ge{font-style:italic}.chroma .gs{font-weight:700}
+}
+@media (prefers-color-scheme: dark) {
+.bg{color:#f8f8f2;background-color:#272822}.chroma{color:#f8f8f2;background-color:#272822;-webkit-text-size-adjust:none}.chroma .err{color:#960050;background-color:#1e0010}.chroma .lnlinks{outline:none;text-decoration:none;color:inherit}.chroma .lntd{vertical-align:top;padding:0;margin:0;border:0}.chroma .lntable{border-spacing:0;padding:0;margin:0;border:0}.chroma .hl{background-color:#3c3d38}.chroma .lnt{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .ln{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .line{display:flex}.chroma .k{color:#66d9ef}.chroma .kc{color:#66d9ef}.chroma .kd{color:#66d9ef}.chroma .kn{color:#f92672}.chroma .kp{color:#66d9ef}.chroma .kr{color:#66d9ef}.chroma .kt{color:#66d9ef}.chroma .na{color:#a6e22e}.chroma .nc{color:#a6e22e}.chroma .no{color:#66d9ef}.chroma .nd{color:#a6e22e}.chroma .ne{color:#a6e22e}.chroma .nx{color:#a6e22e}.chroma .nt{color:#f92672}.chroma .nf{color:#a6e22e}.chroma .fm{color:#a6e22e}.chroma .l{color:#ae81ff}.chroma .ld{color:#e6db74}.chroma .s{color:#e6db74}.chroma .sa{color:#e6db74}.chroma .sb{color:#e6db74}.chroma .sc{color:#e6db74}.chroma .dl{color:#e6db74}.chroma .sd{color:#e6db74}.chroma .s2{color:#e6db74}.chroma .se{color:#ae81ff}.chroma .sh{color:#e6db74}.chroma .si{color:#e6db74}.chroma .sx{color:#e6db74}.chroma .sr{color:#e6db74}.chroma .s1{color:#e6db74}.chroma .ss{color:#e6db74}.chroma .m{color:#ae81ff}.chroma .mb{color:#ae81ff}.chroma .mf{color:#ae81ff}.chroma .mh{color:#ae81ff}.chroma .mi{color:#ae81ff}.chroma .il{color:#ae81ff}.chroma .mo{color:#ae81ff}.chroma .o{color:#f92672}.chroma .ow{color:#f92672}.chroma .or{color:#f92672}.chroma .p{color:#f8f8f2}.chroma .c{color:#75715e}.chroma .ch{color:#75715e}.chroma .cm{color:#75715e}.chroma .c1{color:#75715e}.chroma .cs{color:#75715e}.chroma .cp{color:#75715e}.chroma .cpf{color:#75715e}.chroma .gd{color:#f92672}.chroma .ge{font-style:italic}.chroma .gi{color:#a6e22e}.chroma .gs{font-weight:700}.chroma .gu{color:#75715e}
+}
+:root{--border-color:rgba(0, 0, 0, 0.15);--accent:#333;--row-alt:rgba(0, 0, 0, 0.03);--row-hover:rgba(0, 0, 0, 0.06)}@media(prefers-color-scheme:dark){:root{--border-color:rgba(255, 255, 255, 0.15);--accent:#e8e8e8;--row-alt:rgba(255, 255, 255, 0.04);--row-hover:rgba(255, 255, 255, 0.08)}}content table{width:100%;border-collapse:collapse;font-size:.95rem;margin:1.5rem 0}content th,content td{padding:.6rem 1rem;border-bottom:1px solid var(--border-color,#ddd);text-align:left}content thead th{border-bottom:2px solid var(--accent,#333);font-weight:600}content tbody tr:nth-child(even){background:var(--row-alt,rgba(0,0,0,2%))}content tbody tr:hover{background:var(--row-hover,rgba(0,0,0,5%))}content .table-wrapper{overflow-x:auto}.logo svg{height:auto;width:auto;display:block;aspect-ratio:1/1;height:2em}.header-row{display:flex;align-items:center;gap:1em}
+</style>
+
+<script>
+const setFavicon = () => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const favicon = document.querySelector('link[rel~="icon"]');
+  favicon.href = isDark ? 'https:\/\/srs.fyi\/favicon\/dark\/favicon-32x32.png' : 'https:\/\/srs.fyi\/favicon\/light\/favicon-32x32.png';
+};
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setFavicon);
+setFavicon();
+</script>
+
+
+
+
 </head>
-<body><header id="banner">
-    <h2><a href="https://srs.fyi/">srs.fyi</a></h2>
-    <nav>
-        <ul>
-            <li>
-                <a href="/" title="posts">posts</a>
-            </li><li>
-                <a href="/about/" title="about">about</a>
-            </li>
-        </ul>
-    </nav>
+
+<body>
+  <header><div class="header-row">
+
+<a class="logo" href="/"> <!-- Generated by text-to-svg.com -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 2.490000009536743 62.650001525878906 54.19999694824219" data-asc="1.0087890625" width="62.650001525878906" height="54.19999694824219"><g fill="var(--text-color)"><g transform="translate(0, 0)"><path d="M13.16 56.69Q10.96 56.69 9.13 55.75Q7.30 54.81 6.19 52.73Q5.08 50.66 5.08 47.29L5.08 36.99Q5.08 34.06 4.10 32.97Q3.13 31.88 1.27 31.79L0 31.71L0 27.34L1.25 27.27Q3.10 27.15 4.08 26.07Q5.05 25 5.05 22.09L5.05 11.87Q5.05 8.50 6.16 6.43Q7.28 4.37 9.12 3.43Q10.96 2.49 13.16 2.49Q14.77 2.49 16.82 3.13L16.82 6.88L15.89 6.88Q12.89 6.88 11.72 7.62Q10.55 8.35 10.55 10.25L10.55 20.04Q10.55 23.63 9.73 25.90Q8.91 28.17 6.59 29.22L6.59 29.86Q8.84 30.91 9.69 33.18Q10.55 35.45 10.55 39.01L10.55 48.90Q10.55 50.81 11.72 51.55Q12.89 52.29 15.89 52.29L16.82 52.29L16.82 56.03Q14.79 56.69 13.16 56.69ZM21.48 41.99Q21.48 40.65 21.64 39.50Q21.80 38.35 22.12 37.06L27.03 37.06L27.03 38.92Q27.03 42.29 28.05 44.08Q29.08 45.87 31.20 45.87Q34.86 45.87 34.86 42.29Q34.86 40.89 34.27 39.36Q33.67 37.82 31.93 35.60L25.34 27.32Q23.61 25.07 22.64 22.83Q21.68 20.58 21.68 17.82Q21.68 13.67 24.26 11.02Q26.83 8.37 31.40 8.37Q35.08 8.37 37.18 9.70Q39.28 11.04 40.15 13.06Q41.02 15.09 41.02 17.21Q41.02 18.55 40.81 19.69Q40.60 20.83 40.33 22.19L35.45 22.19L35.45 20.19Q35.45 16.89 34.40 15.11Q33.35 13.33 31.40 13.33Q29.61 13.33 28.70 14.32Q27.78 15.31 27.78 16.97Q27.78 18.38 28.37 19.54Q28.96 20.70 29.86 21.92L37.21 31.25Q39.23 33.86 40.30 36.22Q41.36 38.57 41.36 41.46Q41.36 45.78 38.60 48.30Q35.84 50.83 31.25 50.83Q27.49 50.83 25.35 49.55Q23.22 48.27 22.35 46.24Q21.48 44.21 21.48 41.99ZM49.49 56.69Q47.85 56.69 45.83 56.03L45.83 52.29L46.75 52.29Q49.76 52.29 50.93 51.55Q52.10 50.81 52.10 48.90L52.10 39.01Q52.10 35.45 52.95 33.18Q53.81 30.91 56.03 29.86L56.03 29.22Q53.74 28.17 52.92 25.90Q52.10 23.63 52.10 20.04L52.10 10.25Q52.10 8.35 50.93 7.62Q49.76 6.88 46.75 6.88L45.83 6.88L45.83 3.13Q46.78 2.83 47.73 2.66Q48.68 2.49 49.49 2.49Q51.68 2.49 53.53 3.43Q55.37 4.37 56.48 6.43Q57.59 8.50 57.59 11.87L57.59 22.09Q57.59 25 58.57 26.07Q59.55 27.15 61.40 27.27L62.65 27.34L62.65 31.71L61.38 31.79Q59.52 31.88 58.54 32.97Q57.57 34.06 57.57 36.99L57.57 47.29Q57.57 50.66 56.47 52.73Q55.37 54.81 53.53 55.75Q51.68 56.69 49.49 56.69Z"/></g></g></svg>
+ </a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/about/">About</a>
+
+</nav>
+</div>
 </header>
-<main id="content">
-<article>
-    <header id="post-header">
-        <h1>Learning Haskell</h1>
-        <div>
-                <time>July 30, 2022</time>
-            </div>
-    </header><p><strong>TLDR:</strong> In this blog post, I list some of the challenges that I faced while learning Haskell.
+  <main>
+
+<h1>Learning Haskell</h1>
+<p>
+  <i>
+    <time datetime='2022-07-30'>
+      30 Jul, 2022
+    </time>
+  </i>
+</p>
+
+<content>
+  <p><strong>TLDR:</strong> In this blog post, I list some of the challenges that I faced while learning Haskell.
 Skip down to <strong>Challenges</strong> to see my list.</p>
 <p>My journey to Haskell dates back to the start of my university days.
 I first heard about Haskell from an older grad student I worked with.
@@ -142,14 +341,14 @@ I am a bit surprised the interpreter does not directly provide this hint;  it wo
 <p>There are two totally separate, almost parallel worlds in Haskell: the world of terms and the world of types.
 However, sometimes there are parallel entities which exist in <em>both</em> worlds which have the <em>same</em> name.
 As an example, consider this definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   -----   -----</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   Type    Term</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="ln">1</span><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">--   -----   -----</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">--   Type    Term</span>
 </span></span></code></pre></div><p>On the left hand side of the equals sign, we are defining a type constructor <code>Bar</code> parameterized over a type variable <code>a</code>.
 Conversely, on the right hand side of the equals sign, we are defining a term constructor <code>Bar</code> parameterized over a term variable <code>a</code>.
 This means we can write things like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="cm">{- Types -}</span> <span class="n">intBar</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Bar</span> <span class="kt">Int</span>
-</span></span><span class="line"><span class="cl"><span class="cm">{- Terms -}</span> <span class="n">intBar</span> <span class="n">x</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">x</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="ln">1</span><span class="cl"><span class="cm">{- Types -}</span> <span class="n">intBar</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Bar</span> <span class="kt">Int</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="cm">{- Terms -}</span> <span class="n">intBar</span> <span class="n">x</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">x</span>
 </span></span></code></pre></div><p>Experienced Haskellers know that:</p>
 <ol>
 <li>the first line is a type signature and makes a statement about the world of types;</li>
@@ -167,14 +366,14 @@ With this extension, the compiler generates a third parallel world of <em>kinds<
 In the book <a href="https://thinkingwithtypes.com"><em>Thinking With Types</em></a>, the author Sandy Maguire invents a kind declaration notation to describe the way this is done.
 As an example, recall the <code>Bar</code> declaration above.
 When the compiler sees this type declaration:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   -----   -----</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   Type    Term</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="ln">1</span><span class="cl"><span class="kr">data</span> <span class="kt">Bar</span> <span class="n">a</span> <span class="ow">=</span> <span class="kt">Bar</span> <span class="n">a</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">--   -----   -----</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">--   Type    Term</span>
 </span></span></code></pre></div><p>It will implicitly generate a kind declaration (not valid Haskell syntax):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="cl"><span class="nf">kind</span> <span class="kt">Bar</span> <span class="n">a</span>  <span class="ow">=</span>  <span class="kt">&#39;Bar</span> <span class="n">a</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   -----     ------</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--   Kind       Type   -- world</span>
-</span></span><span class="line"><span class="cl"><span class="c1">--  (Type)     (Term)  -- world promoted from</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-haskell" data-lang="haskell"><span class="line"><span class="ln">1</span><span class="cl"><span class="nf">kind</span> <span class="kt">Bar</span> <span class="n">a</span>  <span class="ow">=</span>  <span class="kt">&#39;Bar</span> <span class="n">a</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="c1">--   -----     ------</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="c1">--   Kind       Type   -- world</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">--  (Type)     (Term)  -- world promoted from</span>
 </span></span></code></pre></div><p>where the left and right sides of the kind declaration are promoted from the left and right hand sides of the type declaration, respectively.</p>
 <p>Thus, in our final tally, <code>Bar</code> (possibly with a leading single quote) now has four possible usages:</p>
 <ol>
@@ -304,10 +503,20 @@ Arguably, array-like languages like APL represent the extreme of terse and simpl
 </li>
 </ol>
 </div>
-</article>
 
-        </main><footer id="footer">
-    Copyright © 2026 Stephen Skeirik
+</content>
+
+
+
+<p>
+  
+</p>
+
+  </main>
+  <footer><p>Copyright &copy; 2022-2026 Stephen Skeirik</p>
 </footer>
+
+  
 </body>
+
 </html>

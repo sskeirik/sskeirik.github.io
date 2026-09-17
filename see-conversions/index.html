@@ -1,72 +1,270 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Stephen&#39;s Personal Blog">
-    
-    <link rel="shortcut icon" href="https://srs.fyi/favicon/favicon.ico">
-    <style>
-      mark { background-color: lightgray }
-    </style>
-    <link rel="stylesheet" href="/css/style.min.css">
+<html lang="en">
 
-    <title>See Conversions</title>
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="https://srs.fyi/favicon/light/favicon-32x32.png" />
+<title>See Conversions | srs.fyi</title>
+<meta name="title" content="See Conversions" />
+<meta name="description" content="I recently1 stumbled across an interesting C function.
+The function was quite simple&ndash;just a few lines long&mdash;so I was sure I understood it.
+And yet, the function produced unexpected results&mdash;and I could not understand why.
+Debugging this tiny function led me down the dark hole that is implicit type conversions in C.
+I have reproduced the function in its entirety below (with a 2-line modification to make the output more readable for this post)." />
+<meta name="keywords" content="" />
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+<style>
+@media (prefers-color-scheme: light) {
+.bg{color:#272822;background-color:#fafafa}.chroma{color:#272822;background-color:#fafafa;-webkit-text-size-adjust:none}.chroma .err{color:#960050;background-color:#1e0010}.chroma .lnlinks{outline:none;text-decoration:none;color:inherit}.chroma .lntd{vertical-align:top;padding:0;margin:0;border:0}.chroma .lntable{border-spacing:0;padding:0;margin:0;border:0}.chroma .hl{background-color:#e1e1e1}.chroma .lnt{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .ln{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .line{display:flex}.chroma .k{color:#00a8c8}.chroma .kc{color:#00a8c8}.chroma .kd{color:#00a8c8}.chroma .kn{color:#f92672}.chroma .kp{color:#00a8c8}.chroma .kr{color:#00a8c8}.chroma .kt{color:#00a8c8}.chroma .n{color:#111}.chroma .na{color:#75af00}.chroma .nc{color:#75af00}.chroma .no{color:#00a8c8}.chroma .nd{color:#75af00}.chroma .ni{color:#111}.chroma .ne{color:#75af00}.chroma .nl{color:#111}.chroma .nn{color:#111}.chroma .nx{color:#75af00}.chroma .py{color:#111}.chroma .nt{color:#f92672}.chroma .nb{color:#111}.chroma .bp{color:#111}.chroma .nv{color:#111}.chroma .vc{color:#111}.chroma .vg{color:#111}.chroma .vi{color:#111}.chroma .vm{color:#111}.chroma .nf{color:#75af00}.chroma .fm{color:#75af00}.chroma .l{color:#ae81ff}.chroma .ld{color:#d88200}.chroma .s{color:#d88200}.chroma .sa{color:#d88200}.chroma .sb{color:#d88200}.chroma .sc{color:#d88200}.chroma .dl{color:#d88200}.chroma .sd{color:#d88200}.chroma .s2{color:#d88200}.chroma .se{color:#8045ff}.chroma .sh{color:#d88200}.chroma .si{color:#d88200}.chroma .sx{color:#d88200}.chroma .sr{color:#d88200}.chroma .s1{color:#d88200}.chroma .ss{color:#d88200}.chroma .m{color:#ae81ff}.chroma .mb{color:#ae81ff}.chroma .mf{color:#ae81ff}.chroma .mh{color:#ae81ff}.chroma .mi{color:#ae81ff}.chroma .il{color:#ae81ff}.chroma .mo{color:#ae81ff}.chroma .o{color:#f92672}.chroma .ow{color:#f92672}.chroma .or{color:#f92672}.chroma .p{color:#111}.chroma .c{color:#75715e}.chroma .ch{color:#75715e}.chroma .cm{color:#75715e}.chroma .c1{color:#75715e}.chroma .cs{color:#75715e}.chroma .cp{color:#75715e}.chroma .cpf{color:#75715e}.chroma .ge{font-style:italic}.chroma .gs{font-weight:700}
+}
+@media (prefers-color-scheme: dark) {
+.bg{color:#f8f8f2;background-color:#272822}.chroma{color:#f8f8f2;background-color:#272822;-webkit-text-size-adjust:none}.chroma .err{color:#960050;background-color:#1e0010}.chroma .lnlinks{outline:none;text-decoration:none;color:inherit}.chroma .lntd{vertical-align:top;padding:0;margin:0;border:0}.chroma .lntable{border-spacing:0;padding:0;margin:0;border:0}.chroma .hl{background-color:#3c3d38}.chroma .lnt{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .ln{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .line{display:flex}.chroma .k{color:#66d9ef}.chroma .kc{color:#66d9ef}.chroma .kd{color:#66d9ef}.chroma .kn{color:#f92672}.chroma .kp{color:#66d9ef}.chroma .kr{color:#66d9ef}.chroma .kt{color:#66d9ef}.chroma .na{color:#a6e22e}.chroma .nc{color:#a6e22e}.chroma .no{color:#66d9ef}.chroma .nd{color:#a6e22e}.chroma .ne{color:#a6e22e}.chroma .nx{color:#a6e22e}.chroma .nt{color:#f92672}.chroma .nf{color:#a6e22e}.chroma .fm{color:#a6e22e}.chroma .l{color:#ae81ff}.chroma .ld{color:#e6db74}.chroma .s{color:#e6db74}.chroma .sa{color:#e6db74}.chroma .sb{color:#e6db74}.chroma .sc{color:#e6db74}.chroma .dl{color:#e6db74}.chroma .sd{color:#e6db74}.chroma .s2{color:#e6db74}.chroma .se{color:#ae81ff}.chroma .sh{color:#e6db74}.chroma .si{color:#e6db74}.chroma .sx{color:#e6db74}.chroma .sr{color:#e6db74}.chroma .s1{color:#e6db74}.chroma .ss{color:#e6db74}.chroma .m{color:#ae81ff}.chroma .mb{color:#ae81ff}.chroma .mf{color:#ae81ff}.chroma .mh{color:#ae81ff}.chroma .mi{color:#ae81ff}.chroma .il{color:#ae81ff}.chroma .mo{color:#ae81ff}.chroma .o{color:#f92672}.chroma .ow{color:#f92672}.chroma .or{color:#f92672}.chroma .p{color:#f8f8f2}.chroma .c{color:#75715e}.chroma .ch{color:#75715e}.chroma .cm{color:#75715e}.chroma .c1{color:#75715e}.chroma .cs{color:#75715e}.chroma .cp{color:#75715e}.chroma .cpf{color:#75715e}.chroma .gd{color:#f92672}.chroma .ge{font-style:italic}.chroma .gi{color:#a6e22e}.chroma .gs{font-weight:700}.chroma .gu{color:#75715e}
+}
+:root{--border-color:rgba(0, 0, 0, 0.15);--accent:#333;--row-alt:rgba(0, 0, 0, 0.03);--row-hover:rgba(0, 0, 0, 0.06)}@media(prefers-color-scheme:dark){:root{--border-color:rgba(255, 255, 255, 0.15);--accent:#e8e8e8;--row-alt:rgba(255, 255, 255, 0.04);--row-hover:rgba(255, 255, 255, 0.08)}}content table{width:100%;border-collapse:collapse;font-size:.95rem;margin:1.5rem 0}content th,content td{padding:.6rem 1rem;border-bottom:1px solid var(--border-color,#ddd);text-align:left}content thead th{border-bottom:2px solid var(--accent,#333);font-weight:600}content tbody tr:nth-child(even){background:var(--row-alt,rgba(0,0,0,2%))}content tbody tr:hover{background:var(--row-hover,rgba(0,0,0,5%))}content .table-wrapper{overflow-x:auto}.logo svg{height:auto;width:auto;display:block;aspect-ratio:1/1;height:2em}.header-row{display:flex;align-items:center;gap:1em}
+</style>
+
+<script>
+const setFavicon = () => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const favicon = document.querySelector('link[rel~="icon"]');
+  favicon.href = isDark ? 'https:\/\/srs.fyi\/favicon\/dark\/favicon-32x32.png' : 'https:\/\/srs.fyi\/favicon\/light\/favicon-32x32.png';
+};
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setFavicon);
+setFavicon();
+</script>
+
+
+
+
 </head>
-<body><header id="banner">
-    <h2><a href="https://srs.fyi/">srs.fyi</a></h2>
-    <nav>
-        <ul>
-            <li>
-                <a href="/" title="posts">posts</a>
-            </li><li>
-                <a href="/about/" title="about">about</a>
-            </li>
-        </ul>
-    </nav>
+
+<body>
+  <header><div class="header-row">
+
+<a class="logo" href="/"> <!-- Generated by text-to-svg.com -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 2.490000009536743 62.650001525878906 54.19999694824219" data-asc="1.0087890625" width="62.650001525878906" height="54.19999694824219"><g fill="var(--text-color)"><g transform="translate(0, 0)"><path d="M13.16 56.69Q10.96 56.69 9.13 55.75Q7.30 54.81 6.19 52.73Q5.08 50.66 5.08 47.29L5.08 36.99Q5.08 34.06 4.10 32.97Q3.13 31.88 1.27 31.79L0 31.71L0 27.34L1.25 27.27Q3.10 27.15 4.08 26.07Q5.05 25 5.05 22.09L5.05 11.87Q5.05 8.50 6.16 6.43Q7.28 4.37 9.12 3.43Q10.96 2.49 13.16 2.49Q14.77 2.49 16.82 3.13L16.82 6.88L15.89 6.88Q12.89 6.88 11.72 7.62Q10.55 8.35 10.55 10.25L10.55 20.04Q10.55 23.63 9.73 25.90Q8.91 28.17 6.59 29.22L6.59 29.86Q8.84 30.91 9.69 33.18Q10.55 35.45 10.55 39.01L10.55 48.90Q10.55 50.81 11.72 51.55Q12.89 52.29 15.89 52.29L16.82 52.29L16.82 56.03Q14.79 56.69 13.16 56.69ZM21.48 41.99Q21.48 40.65 21.64 39.50Q21.80 38.35 22.12 37.06L27.03 37.06L27.03 38.92Q27.03 42.29 28.05 44.08Q29.08 45.87 31.20 45.87Q34.86 45.87 34.86 42.29Q34.86 40.89 34.27 39.36Q33.67 37.82 31.93 35.60L25.34 27.32Q23.61 25.07 22.64 22.83Q21.68 20.58 21.68 17.82Q21.68 13.67 24.26 11.02Q26.83 8.37 31.40 8.37Q35.08 8.37 37.18 9.70Q39.28 11.04 40.15 13.06Q41.02 15.09 41.02 17.21Q41.02 18.55 40.81 19.69Q40.60 20.83 40.33 22.19L35.45 22.19L35.45 20.19Q35.45 16.89 34.40 15.11Q33.35 13.33 31.40 13.33Q29.61 13.33 28.70 14.32Q27.78 15.31 27.78 16.97Q27.78 18.38 28.37 19.54Q28.96 20.70 29.86 21.92L37.21 31.25Q39.23 33.86 40.30 36.22Q41.36 38.57 41.36 41.46Q41.36 45.78 38.60 48.30Q35.84 50.83 31.25 50.83Q27.49 50.83 25.35 49.55Q23.22 48.27 22.35 46.24Q21.48 44.21 21.48 41.99ZM49.49 56.69Q47.85 56.69 45.83 56.03L45.83 52.29L46.75 52.29Q49.76 52.29 50.93 51.55Q52.10 50.81 52.10 48.90L52.10 39.01Q52.10 35.45 52.95 33.18Q53.81 30.91 56.03 29.86L56.03 29.22Q53.74 28.17 52.92 25.90Q52.10 23.63 52.10 20.04L52.10 10.25Q52.10 8.35 50.93 7.62Q49.76 6.88 46.75 6.88L45.83 6.88L45.83 3.13Q46.78 2.83 47.73 2.66Q48.68 2.49 49.49 2.49Q51.68 2.49 53.53 3.43Q55.37 4.37 56.48 6.43Q57.59 8.50 57.59 11.87L57.59 22.09Q57.59 25 58.57 26.07Q59.55 27.15 61.40 27.27L62.65 27.34L62.65 31.71L61.38 31.79Q59.52 31.88 58.54 32.97Q57.57 34.06 57.57 36.99L57.57 47.29Q57.57 50.66 56.47 52.73Q55.37 54.81 53.53 55.75Q51.68 56.69 49.49 56.69Z"/></g></g></svg>
+ </a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/about/">About</a>
+
+</nav>
+</div>
 </header>
-<main id="content">
-<article>
-    <header id="post-header">
-        <h1>See Conversions</h1>
-        <div>
-                <time>February 19, 2026</time>
-            </div>
-    </header><p>I recently<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> stumbled across an interesting C function.
+  <main>
+
+<h1>See Conversions</h1>
+<p>
+  <i>
+    <time datetime='2026-02-19'>
+      19 Feb, 2026
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>I recently<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> stumbled across an interesting C function.
 The function was quite simple&ndash;just a few lines long&mdash;so I was sure I understood it.
 And yet, the function produced unexpected results&mdash;and I could not understand why.
 Debugging this tiny function led me down the dark hole that is implicit type conversions in C.
 I have reproduced the function in its entirety below (with a 2-line modification to make the output more readable for this post).</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>To avoid making this post too long<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, I assume the reader is familiar with <a href="https://en.wikipedia.org/wiki/Hexadecimal">hexadecimal notation</a> and C language <a href="https://en.cppreference.com/w/c/language/escape.html">string escape sequences</a>.</p>
 <p>From first glance, we can see this this function will misbehave if the memory region argument is invalid.
 But if we do that, that&rsquo;s on us&mdash;we failed to respect the contract of this function.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
 <p>Here is a complete example program containing this function that applies it to a few test vectors.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
-</span></span><span class="line"><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span>     <span class="mi">0</span><span class="p">);</span> <span class="c1">// empty string
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\x00</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; smallest possible byte value
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\x01</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; smallest + 1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\xff</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; largest possible byte value
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\xfe</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; largest - 1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
+</span></span></span><span class="line"><span class="ln"> 5</span><span class="cl"><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">12</span><span class="cl">
+</span></span><span class="line"><span class="ln">13</span><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span>     <span class="mi">0</span><span class="p">);</span> <span class="c1">// empty string
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\x00</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; smallest possible byte value
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\x01</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; smallest + 1
+</span></span></span><span class="line"><span class="ln">17</span><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\xff</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; largest possible byte value
+</span></span></span><span class="line"><span class="ln">18</span><span class="cl">   <span class="nf">print_hex</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\xfe</span><span class="s">&#34;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// singleton; largest - 1
+</span></span></span><span class="line"><span class="ln">19</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>What text do you expect this function will print?
 To avoid confusion, let&rsquo;s assume we&rsquo;re running this program on a standard x86-64 Linux box.</p>
 <p>Take your time and think about it for a second.</p>
@@ -82,10 +280,10 @@ To avoid confusion, let&rsquo;s assume we&rsquo;re running this program on a sta
 <li>If the <em>format string</em> has <em>N</em> conversion specifications, the <code>printf</code> call should have <em>N</em> arguments (excluding the format string itself).</li>
 </ul>
 <p><em>Example:</em></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">player</span> <span class="o">=</span> <span class="s">&#34;Bob&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">pts</span> <span class="o">=</span> <span class="mi">101</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%s scored %u point(s)!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">pts</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="c1">// prints: &#34;Bob scored 101 point(s)!&#34;
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="kt">char</span> <span class="o">*</span><span class="n">player</span> <span class="o">=</span> <span class="s">&#34;Bob&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">pts</span> <span class="o">=</span> <span class="mi">101</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%s scored %u point(s)!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">pts</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">4</span><span class="cl"><span class="c1">// prints: &#34;Bob scored 101 point(s)!&#34;
 </span></span></span></code></pre></div><p>Our example had two conversion specifications:</p>
 <ul>
 <li><code>%s</code> - which prints its corresponding argument as a string;</li>
@@ -114,13 +312,12 @@ To avoid confusion, let&rsquo;s assume we&rsquo;re running this program on a sta
 <br/>
 <details>
 <summary> <u>When you're ready, click here to see what text this program prints. </u> </summary>
-<code>
-{}<br/>
-{00}<br/>
-{01}<br/>
-{ffffffff}<br/>
-{fffffffe}<br/>
-</code>
+<pre class="bg"><code>{}
+{00}
+{01}
+{ffffffff}
+{fffffffe}
+</pre></code>
 </details>
 <br/>
 Finally, if you want an explanation of this behavior, read on!
@@ -171,55 +368,55 @@ What about <code>pts</code>?</p>
 <p>Thus, in this section, we&rsquo;ll focus on a small example:
 all 3 bit sequences written in a big-endian notation (i.e., with the most significant bit written first) and their two&rsquo;s complement values:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:right">Binary</th>
-<th>       </th>
-<th style="text-align:right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right"><code>011</code></td>
-<td></td>
-<td style="text-align:right">3</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>010</code></td>
-<td></td>
-<td style="text-align:right">2</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>001</code></td>
-<td></td>
-<td style="text-align:right">1</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>000</code></td>
-<td></td>
-<td style="text-align:right">0</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>111</code></td>
-<td></td>
-<td style="text-align:right">-1</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>110</code></td>
-<td></td>
-<td style="text-align:right">-2</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>101</code></td>
-<td></td>
-<td style="text-align:right">-3</td>
-</tr>
-<tr>
-<td style="text-align:right"><code>100</code></td>
-<td></td>
-<td style="text-align:right">-4</td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: right">Binary</th>
+					<th>       </th>
+					<th style="text-align: right">Value</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: right"><code>011</code></td>
+					<td></td>
+					<td style="text-align: right">3</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>010</code></td>
+					<td></td>
+					<td style="text-align: right">2</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>001</code></td>
+					<td></td>
+					<td style="text-align: right">1</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>000</code></td>
+					<td></td>
+					<td style="text-align: right">0</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>111</code></td>
+					<td></td>
+					<td style="text-align: right">-1</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>110</code></td>
+					<td></td>
+					<td style="text-align: right">-2</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>101</code></td>
+					<td></td>
+					<td style="text-align: right">-3</td>
+			</tr>
+			<tr>
+					<td style="text-align: right"><code>100</code></td>
+					<td></td>
+					<td style="text-align: right">-4</td>
+			</tr>
+	</tbody>
 </table>
 <br/>
 <details>
@@ -248,108 +445,108 @@ By applying this template to concrete bit string <code>100</code>, we obtain the
 <p>How many versions of <code>char</code> are there?
 In fact, there are <em>three</em>:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Type</th>
-<th style="text-align:right">Numeric Range<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>unsigned char</code></td>
-<td style="text-align:right"><em>[0, 255]</em></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><em>[-128, 127]</em></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>char</code></td>
-<td style="text-align:right"><em>either [0, 255] or [-128, 127]</em></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Type</th>
+					<th style="text-align: right">Numeric Range<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>unsigned char</code></td>
+					<td style="text-align: right"><em>[0, 255]</em></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><em>[-128, 127]</em></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>char</code></td>
+					<td style="text-align: right"><em>either [0, 255] or [-128, 127]</em></td>
+			</tr>
+	</tbody>
 </table>
 <p>However, on common platforms, the range of <code>char</code> and <code>signed char</code> have equal ranges.</p>
 <p>But why <em>three</em> separate <code>char</code> types?
 These various types map to <em>three</em> distinct ways that <code>char</code>s are used in <em>C</em>:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Designated <code>char</code>-variants</th>
-<th style="text-align:left">Usage</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><br/><code>signed char</code>, <code>unsigned char</code></td>
-<td style="text-align:left"><br/>signed/unsigned number (arithmetic) <br/></td>
-</tr>
-<tr>
-<td style="text-align:left"><br/><code>unsigned char</code></td>
-<td style="text-align:left"><br/>smallest uninterpreted unit of addressable memory<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup> <br/></td>
-</tr>
-<tr>
-<td style="text-align:left"><br/><code>char</code></td>
-<td style="text-align:left"><br/>character in an encoded string <br/></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Designated <code>char</code>-variants</th>
+					<th style="text-align: left">Usage</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><br/><code>signed char</code>, <code>unsigned char</code></td>
+					<td style="text-align: left"><br/>signed/unsigned number (arithmetic) <br/></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><br/><code>unsigned char</code></td>
+					<td style="text-align: left"><br/>smallest uninterpreted unit of addressable memory<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup> <br/></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><br/><code>char</code></td>
+					<td style="text-align: left"><br/>character in an encoded string <br/></td>
+			</tr>
+	</tbody>
 </table>
 <p>Essentially, this extra type variant <code>char</code> is intended to represent string data.
 Modern systems languages may have a fourth variant explicitly for uninterpreted memory access to help keep things clear.
 For example, in Golang, we have the following types:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Type</th>
-<th style="text-align:left">Usage</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>uint8</code>, <code>int8</code></td>
-<td style="text-align:left">signed/unsigned number (arithmetic)</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>byte</code></td>
-<td style="text-align:left">alias for <code>uint8</code> and smallest uninterpreted unit of addressable memory</td>
-</tr>
-<tr>
-<td style="text-align:left"><code>rune</code></td>
-<td style="text-align:left">character in an encoded string</td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Type</th>
+					<th style="text-align: left">Usage</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>uint8</code>, <code>int8</code></td>
+					<td style="text-align: left">signed/unsigned number (arithmetic)</td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>byte</code></td>
+					<td style="text-align: left">alias for <code>uint8</code> and smallest uninterpreted unit of addressable memory</td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>rune</code></td>
+					<td style="text-align: left">character in an encoded string</td>
+			</tr>
+	</tbody>
 </table>
 <p>Coming back to <em>C</em>, note that other<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup> integer types can only be used for arithmetic purposes; they cannot be used <em>directly</em> for representing strings<sup id="fnref:9"><a href="#fn:9" class="footnote-ref" role="doc-noteref">9</a></sup> or memory access<sup id="fnref:10"><a href="#fn:10" class="footnote-ref" role="doc-noteref">10</a></sup>.</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Signed Variant</th>
-<th>    </th>
-<th style="text-align:left">Unsigned Variant</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>short</code></td>
-<td></td>
-<td style="text-align:left"><code>unsigned short</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td></td>
-<td style="text-align:left"><code>unsigned int</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>long</code></td>
-<td></td>
-<td style="text-align:left"><code>unsigned long</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>long long</code></td>
-<td></td>
-<td style="text-align:left"><code>unsigned long long</code></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Signed Variant</th>
+					<th>    </th>
+					<th style="text-align: left">Unsigned Variant</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>short</code></td>
+					<td></td>
+					<td style="text-align: left"><code>unsigned short</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td></td>
+					<td style="text-align: left"><code>unsigned int</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>long</code></td>
+					<td></td>
+					<td style="text-align: left"><code>unsigned long</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>long long</code></td>
+					<td></td>
+					<td style="text-align: left"><code>unsigned long long</code></td>
+			</tr>
+	</tbody>
 </table>
 <h3 id="default-argument-promotions">Default Argument Promotions</h3>
 <p>Before we can define how default argument promotions, we have to dive into the details of variadic functions.
@@ -357,7 +554,7 @@ For brevity, we&rsquo;ll skip some of the gory details; see <a href="https://en.
 <h4 id="variadic-functions">Variadic Functions</h4>
 <p>According to the <em>C</em> standard, variadic functions are declared by adding an ellipsis to the end of the formal parameter set.
 For example, the declaration:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">printf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="p">...)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="kt">int</span> <span class="nf">printf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="p">...)</span>
 </span></span></code></pre></div><p>describes a function with:</p>
 <ol>
 <li>exactly one required parameter of type <code>const char*</code>;</li>
@@ -371,41 +568,41 @@ For example, the declaration:</p>
 <li><code>va_end(va_list)</code> - finalizes the variadic parameter set</li>
 </ul>
 <p>Let&rsquo;s see an example program below:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdarg.h&gt;</span><span class="cp">
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
-</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">cnt</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="c1">// declare the variable that stores the variadic parameter set
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">va_list</span> <span class="n">args</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// initialize the variadic parameter set
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// the second argument should be the name of the last
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// non-variadic formal parameter; in this case, cnt
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">va_start</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">cnt</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cnt</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// return the value of the next variadic parameter
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// (in this case, it must be compatible with type int)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">elt</span> <span class="o">=</span> <span class="nf">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">sum</span> <span class="o">+=</span> <span class="n">elt</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// finalize the variadic parameter set
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">va_end</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">sum</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// should print:
-</span></span></span><span class="line"><span class="cl"><span class="c1">// Sums were 15, 7, 0, 0
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum1</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum2</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum3</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">sum4</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Sums were %d, %d, %d, %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sum1</span><span class="p">,</span> <span class="n">sum2</span><span class="p">,</span> <span class="n">sum3</span><span class="p">,</span> <span class="n">sum4</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln"> 1</span><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="ln"> 2</span><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdarg.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="ln"> 3</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 4</span><span class="cl"><span class="kt">int</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">cnt</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln"> 5</span><span class="cl">  <span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 6</span><span class="cl">
+</span></span><span class="line"><span class="ln"> 7</span><span class="cl">  <span class="c1">// declare the variable that stores the variadic parameter set
+</span></span></span><span class="line"><span class="ln"> 8</span><span class="cl">  <span class="n">va_list</span> <span class="n">args</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln"> 9</span><span class="cl">  <span class="c1">// initialize the variadic parameter set
+</span></span></span><span class="line"><span class="ln">10</span><span class="cl">  <span class="c1">// the second argument should be the name of the last
+</span></span></span><span class="line"><span class="ln">11</span><span class="cl">  <span class="c1">// non-variadic formal parameter; in this case, cnt
+</span></span></span><span class="line"><span class="ln">12</span><span class="cl">  <span class="nf">va_start</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">cnt</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">13</span><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">cnt</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">14</span><span class="cl">    <span class="c1">// return the value of the next variadic parameter
+</span></span></span><span class="line"><span class="ln">15</span><span class="cl">    <span class="c1">// (in this case, it must be compatible with type int)
+</span></span></span><span class="line"><span class="ln">16</span><span class="cl">    <span class="kt">int</span> <span class="n">elt</span> <span class="o">=</span> <span class="nf">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">17</span><span class="cl">
+</span></span><span class="line"><span class="ln">18</span><span class="cl">    <span class="n">sum</span> <span class="o">+=</span> <span class="n">elt</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">19</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">20</span><span class="cl">  <span class="c1">// finalize the variadic parameter set
+</span></span></span><span class="line"><span class="ln">21</span><span class="cl">  <span class="nf">va_end</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">22</span><span class="cl">
+</span></span><span class="line"><span class="ln">23</span><span class="cl">  <span class="k">return</span> <span class="n">sum</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">24</span><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="ln">25</span><span class="cl">
+</span></span><span class="line"><span class="ln">26</span><span class="cl"><span class="c1">// should print:
+</span></span></span><span class="line"><span class="ln">27</span><span class="cl"><span class="c1">// Sums were 15, 7, 0, 0
+</span></span></span><span class="line"><span class="ln">28</span><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">29</span><span class="cl">  <span class="kt">int</span> <span class="n">sum1</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">30</span><span class="cl">  <span class="kt">int</span> <span class="n">sum2</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">31</span><span class="cl">  <span class="kt">int</span> <span class="n">sum3</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">32</span><span class="cl">  <span class="kt">int</span> <span class="n">sum4</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">33</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Sums were %d, %d, %d, %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sum1</span><span class="p">,</span> <span class="n">sum2</span><span class="p">,</span> <span class="n">sum3</span><span class="p">,</span> <span class="n">sum4</span><span class="p">);</span>
+</span></span><span class="line"><span class="ln">34</span><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">35</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>There are some restrictions on the use of these macros; otherwise, the behavior of the program is undefined:</p>
 <ol>
 <li>the first argument to <code>va_start</code>, <code>va_arg</code>, and <code>va_end</code> must have type <code>va_list</code>;</li>
@@ -416,9 +613,9 @@ For example, the declaration:</p>
 <p>This last point is the one we are interested in.</p>
 <h4 id="variadic-parameters-and-default-argument-promotions">Variadic Parameters and Default Argument Promotions</h4>
 <p>Consider the following call to <code>variadic_sum</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">first_arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">second_arg</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">first_arg</span><span class="p">,</span> <span class="n">second_arg</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="kt">int</span> <span class="n">first_arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="kt">float</span> <span class="n">second_arg</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">first_arg</span><span class="p">,</span> <span class="n">second_arg</span><span class="p">);</span>
 </span></span></code></pre></div><p>Is it well-defined?
 The answer is <em>no</em>, because:</p>
 <p>Since the first parameter <code>cnt == 2</code>, the <code>va_arg</code> macro will be called exactly twice, but&hellip;
@@ -444,9 +641,9 @@ The rule breaks down into four cases which are applied in order:</p>
 <li>otherwise, its type is unchanged.</li>
 </ol>
 <p>So, coming back to our example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">first_arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">second_arg</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">first_arg</span><span class="p">,</span> <span class="n">second_arg</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="kt">int</span> <span class="n">first_arg</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="kt">float</span> <span class="n">second_arg</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="nf">variadic_sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">first_arg</span><span class="p">,</span> <span class="n">second_arg</span><span class="p">);</span>
 </span></span></code></pre></div><p>Due to the default argument promotion rule, on the second call to <code>va_arg(args, int)</code>, the variadic parameter which binds value <code>second_arg</code> actually has type <code>double</code> (even though <code>second_arg</code> has type <code>float</code>).
 Since the type <code>double</code> is not compatible with type <code>int</code>, the behavior of this program is undefined.</p>
 <h3 id="signed-to-unsigned-integer-conversion">Signed-to-Unsigned Integer Conversion</h3>
@@ -461,296 +658,296 @@ Let&rsquo;s recall the rule we saw above.</p>
 <p>For our examples, suppose we have a standard modern C platform where <code>CHAR_BIT == 8</code> and <code>sizeof(int) == 4</code> (i.e., each <code>int</code> is 32 bits wide).
 Then the types below would have the following ranges:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Type</th>
-<th>    </th>
-<th style="text-align:left">Range</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td></td>
-<td style="text-align:left"><code>[-2^7,2^7)</code> or <code>[-128,128)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>unsigned char</code></td>
-<td></td>
-<td style="text-align:left"><code>[0, 2^8)</code> or <code>[0, 256)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td></td>
-<td style="text-align:left"><code>[-2^31,2^31)</code> or <code>[-2147483648,2147483648)</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>unsigned int</code></td>
-<td></td>
-<td style="text-align:left"><code>[0, 2^32)</code> or <code>[0, 4294967296)</code></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Type</th>
+					<th>    </th>
+					<th style="text-align: left">Range</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td></td>
+					<td style="text-align: left"><code>[-2^7,2^7)</code> or <code>[-128,128)</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>unsigned char</code></td>
+					<td></td>
+					<td style="text-align: left"><code>[0, 2^8)</code> or <code>[0, 256)</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td></td>
+					<td style="text-align: left"><code>[-2^31,2^31)</code> or <code>[-2147483648,2147483648)</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>unsigned int</code></td>
+					<td></td>
+					<td style="text-align: left"><code>[0, 2^32)</code> or <code>[0, 4294967296)</code></td>
+			</tr>
+	</tbody>
 </table>
 <p>Recall that there is no <code>signed int</code> type; <code>int</code> is defined to be <em>signed</em>.</p>
 <p>Now let&rsquo;s list a few <code>signed char/int</code> to <code>unsigned char</code> conversions:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Input Type</th>
-<th style="text-align:right">Input</th>
-<th>     </th>
-<th style="text-align:right">Output</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>128</code></td>
-<td></td>
-<td style="text-align:right"><code>128</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>127</code></td>
-<td></td>
-<td style="text-align:right"><code>127</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>2</code></td>
-<td></td>
-<td style="text-align:right"><code>2</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>1</code></td>
-<td></td>
-<td style="text-align:right"><code>1</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>0</code></td>
-<td></td>
-<td style="text-align:right"><code>0</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>-1</code></td>
-<td></td>
-<td style="text-align:right"><code>255</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>-2</code></td>
-<td></td>
-<td style="text-align:right"><code>254</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>-127</code></td>
-<td></td>
-<td style="text-align:right"><code>129</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>signed char</code></td>
-<td style="text-align:right"><code>-128</code></td>
-<td></td>
-<td style="text-align:right"><code>128</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>258</code></td>
-<td></td>
-<td style="text-align:right"><code>2</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>257</code></td>
-<td></td>
-<td style="text-align:right"><code>1</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>256</code></td>
-<td></td>
-<td style="text-align:right"><code>0</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>255</code></td>
-<td></td>
-<td style="text-align:right"><code>255</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>-127</code></td>
-<td></td>
-<td style="text-align:right"><code>129</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>-128</code></td>
-<td></td>
-<td style="text-align:right"><code>128</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>-129</code></td>
-<td></td>
-<td style="text-align:right"><code>127</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>int</code></td>
-<td style="text-align:right"><code>-2147483648</code></td>
-<td></td>
-<td style="text-align:right"><code>0</code></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Input Type</th>
+					<th style="text-align: right">Input</th>
+					<th>     </th>
+					<th style="text-align: right">Output</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>128</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>127</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>2</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>1</code></td>
+					<td></td>
+					<td style="text-align: right"><code>1</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>0</code></td>
+					<td></td>
+					<td style="text-align: right"><code>0</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>-1</code></td>
+					<td></td>
+					<td style="text-align: right"><code>255</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>-2</code></td>
+					<td></td>
+					<td style="text-align: right"><code>254</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>-127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>129</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>signed char</code></td>
+					<td style="text-align: right"><code>-128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>128</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>258</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>257</code></td>
+					<td></td>
+					<td style="text-align: right"><code>1</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>256</code></td>
+					<td></td>
+					<td style="text-align: right"><code>0</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>255</code></td>
+					<td></td>
+					<td style="text-align: right"><code>255</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>-127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>129</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>-128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>128</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>-129</code></td>
+					<td></td>
+					<td style="text-align: right"><code>127</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>int</code></td>
+					<td style="text-align: right"><code>-2147483648</code></td>
+					<td></td>
+					<td style="text-align: right"><code>0</code></td>
+			</tr>
+	</tbody>
 </table>
 <p>And a few consider <code>signed char/int</code> to <code>unsigned int</code> conversions:</p>
 <table>
-<thead>
-<tr>
-<th>Input Type</th>
-<th style="text-align:right">Input</th>
-<th>     </th>
-<th style="text-align:right">Output</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>128</code></td>
-<td></td>
-<td style="text-align:right"><code>128</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>127</code></td>
-<td></td>
-<td style="text-align:right"><code>127</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>2</code></td>
-<td></td>
-<td style="text-align:right"><code>2</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>1</code></td>
-<td></td>
-<td style="text-align:right"><code>1</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>0</code></td>
-<td></td>
-<td style="text-align:right"><code>0</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>-1</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967295</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>-2</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967294</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>-127</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967169</code></td>
-</tr>
-<tr>
-<td><code>signed char</code></td>
-<td style="text-align:right"><code>-128</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967168</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>2147483648</code></td>
-<td></td>
-<td style="text-align:right"><code>2147483648</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>2147483647</code></td>
-<td></td>
-<td style="text-align:right"><code>2147483647</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>128</code></td>
-<td></td>
-<td style="text-align:right"><code>128</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>127</code></td>
-<td></td>
-<td style="text-align:right"><code>127</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>2</code></td>
-<td></td>
-<td style="text-align:right"><code>2</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>1</code></td>
-<td></td>
-<td style="text-align:right"><code>1</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>0</code></td>
-<td></td>
-<td style="text-align:right"><code>0</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>-1</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967295</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>-2</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967294</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>-127</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967169</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>-128</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967168</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>-129</code></td>
-<td></td>
-<td style="text-align:right"><code>4294967167</code></td>
-</tr>
-<tr>
-<td><code>int</code></td>
-<td style="text-align:right"><code>-2147483648</code></td>
-<td></td>
-<td style="text-align:right"><code>2147483648</code></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th>Input Type</th>
+					<th style="text-align: right">Input</th>
+					<th>     </th>
+					<th style="text-align: right">Output</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>128</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>127</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>2</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>1</code></td>
+					<td></td>
+					<td style="text-align: right"><code>1</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>0</code></td>
+					<td></td>
+					<td style="text-align: right"><code>0</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>-1</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967295</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>-2</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967294</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>-127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967169</code></td>
+			</tr>
+			<tr>
+					<td><code>signed char</code></td>
+					<td style="text-align: right"><code>-128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967168</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>2147483648</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2147483648</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>2147483647</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2147483647</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>128</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>127</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>2</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>1</code></td>
+					<td></td>
+					<td style="text-align: right"><code>1</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>0</code></td>
+					<td></td>
+					<td style="text-align: right"><code>0</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>-1</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967295</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>-2</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967294</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>-127</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967169</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>-128</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967168</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>-129</code></td>
+					<td></td>
+					<td style="text-align: right"><code>4294967167</code></td>
+			</tr>
+			<tr>
+					<td><code>int</code></td>
+					<td style="text-align: right"><code>-2147483648</code></td>
+					<td></td>
+					<td style="text-align: right"><code>2147483648</code></td>
+			</tr>
+	</tbody>
 </table>
 <p>I leave double-checking the results in this table as an exercise for the reader.</p>
 <p>One important point to note from these rules is that the result of the conversion only depends on the input value and the output type; the input type is irrelevant.</p>
@@ -762,14 +959,14 @@ Then the types below would have the following ranges:</p>
 <h2 id="putting-it-all-together">Putting It All Together</h2>
 <p>We now have enough details to piece together why our original program (copied below for your convenience) behaves the way it does.
 As above, let&rsquo;s assume that we&rsquo;re running this program on a standard x86-64 Linux box.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="c1">// requires bytes+0 to bytes+sz are valid memory addresses
+</span></span></span><span class="line"><span class="ln">2</span><span class="cl"><span class="kt">void</span> <span class="nf">print_hex</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">bytes</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">3</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;{&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="ln">4</span><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="ln">5</span><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02x&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="ln">6</span><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="ln">7</span><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span> <span class="c1">// added for readability
+</span></span></span><span class="line"><span class="ln">8</span><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>For each call to <code>printf</code> in the loop, the following type conversions are performed on the argument <code>bytes[i]</code>:</p>
 <ol start="0">
 <li>
@@ -808,64 +1005,64 @@ To do this for our test vectors, we need to:</p>
 </ol>
 <p>To speed things along, I&rsquo;ve gone ahead and interpreted the input values and then applied the conversion rules in the table below.</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Test Vector</th>
-<th>    </th>
-<th style="text-align:right">Input Value</th>
-<th>    </th>
-<th style="text-align:right">Converted Value</th>
-<th>    </th>
-<th style="text-align:left">Output String</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>&quot;&quot;</code></td>
-<td></td>
-<td style="text-align:right">N/A</td>
-<td></td>
-<td style="text-align:right">N/A</td>
-<td></td>
-<td style="text-align:left"><code>{}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\x00&quot;</code></td>
-<td></td>
-<td style="text-align:right">0</td>
-<td></td>
-<td style="text-align:right">0</td>
-<td></td>
-<td style="text-align:left"><code>{00}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\x01&quot;</code></td>
-<td></td>
-<td style="text-align:right">1</td>
-<td></td>
-<td style="text-align:right">1</td>
-<td></td>
-<td style="text-align:left"><code>{01}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\xff&quot;</code></td>
-<td></td>
-<td style="text-align:right">-1</td>
-<td></td>
-<td style="text-align:right">-1 + 2^32</td>
-<td></td>
-<td style="text-align:left"><code>{ffffffff}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\xfe&quot;</code></td>
-<td></td>
-<td style="text-align:right">-2</td>
-<td></td>
-<td style="text-align:right">-2 + 2^32</td>
-<td></td>
-<td style="text-align:left"><code>{fffffffe}</code></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Test Vector</th>
+					<th>    </th>
+					<th style="text-align: right">Input Value</th>
+					<th>    </th>
+					<th style="text-align: right">Converted Value</th>
+					<th>    </th>
+					<th style="text-align: left">Output String</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>&quot;&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">N/A</td>
+					<td></td>
+					<td style="text-align: right">N/A</td>
+					<td></td>
+					<td style="text-align: left"><code>{}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\x00&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">0</td>
+					<td></td>
+					<td style="text-align: right">0</td>
+					<td></td>
+					<td style="text-align: left"><code>{00}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\x01&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">1</td>
+					<td></td>
+					<td style="text-align: right">1</td>
+					<td></td>
+					<td style="text-align: left"><code>{01}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\xff&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">-1</td>
+					<td></td>
+					<td style="text-align: right">-1 + 2^32</td>
+					<td></td>
+					<td style="text-align: left"><code>{ffffffff}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\xfe&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">-2</td>
+					<td></td>
+					<td style="text-align: right">-2 + 2^32</td>
+					<td></td>
+					<td style="text-align: left"><code>{fffffffe}</code></td>
+			</tr>
+	</tbody>
 </table>
 <p>Now, we can plainly see why the final two values printed such large output strings&mdash;the converted value expressions contain an additional <code>2^32</code> term!</p>
 <h3 id="so-what-now">So What Now?</h3>
@@ -886,7 +1083,7 @@ Thus, the final value will be identical to the initial value.</p>
 <p>In this approach, we leave the type of input <code>bytes</code> unchanged from <code>char*</code> and instead rely on more advanced <code>printf</code> features.
 As it turns out, the <code>printf</code> function includes a wide variety of type size modifiers.
 If we change our <code>printf</code> invocation to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02hhx&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="ln">1</span><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%02hhx&#34;</span><span class="p">,</span> <span class="n">bytes</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 </span></span></code></pre></div><p>This will force <code>printf</code> to cast input argument <code>byte[i]</code> to type <code>unsigned char</code>.
 And, if you manually apply the signed-to-unsigned conversion rules above, you will see that this gives us the intended result.</p>
 </li>
@@ -894,64 +1091,64 @@ And, if you manually apply the signed-to-unsigned conversion rules above, you wi
 <p>After making either change, our program will behave as expected.
 That is, our test vectors will produce the following tables:</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Test Vector</th>
-<th>    </th>
-<th style="text-align:right">Input Value</th>
-<th>    </th>
-<th style="text-align:right">Converted Value</th>
-<th>    </th>
-<th style="text-align:left">Output String</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>&quot;&quot;</code></td>
-<td></td>
-<td style="text-align:right">N/A</td>
-<td></td>
-<td style="text-align:right">N/A</td>
-<td></td>
-<td style="text-align:left"><code>{}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\x00&quot;</code></td>
-<td></td>
-<td style="text-align:right">0</td>
-<td></td>
-<td style="text-align:right">0</td>
-<td></td>
-<td style="text-align:left"><code>{00}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\x01&quot;</code></td>
-<td></td>
-<td style="text-align:right">1</td>
-<td></td>
-<td style="text-align:right">1</td>
-<td></td>
-<td style="text-align:left"><code>{01}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\xff&quot;</code></td>
-<td></td>
-<td style="text-align:right">255 (or) -1</td>
-<td></td>
-<td style="text-align:right">255</td>
-<td></td>
-<td style="text-align:left"><code>{ff}</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>&quot;\xfe&quot;</code></td>
-<td></td>
-<td style="text-align:right">254 (or) -2</td>
-<td></td>
-<td style="text-align:right">254</td>
-<td></td>
-<td style="text-align:left"><code>{fe}</code></td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">Test Vector</th>
+					<th>    </th>
+					<th style="text-align: right">Input Value</th>
+					<th>    </th>
+					<th style="text-align: right">Converted Value</th>
+					<th>    </th>
+					<th style="text-align: left">Output String</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left"><code>&quot;&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">N/A</td>
+					<td></td>
+					<td style="text-align: right">N/A</td>
+					<td></td>
+					<td style="text-align: left"><code>{}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\x00&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">0</td>
+					<td></td>
+					<td style="text-align: right">0</td>
+					<td></td>
+					<td style="text-align: left"><code>{00}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\x01&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">1</td>
+					<td></td>
+					<td style="text-align: right">1</td>
+					<td></td>
+					<td style="text-align: left"><code>{01}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\xff&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">255 (or) -1</td>
+					<td></td>
+					<td style="text-align: right">255</td>
+					<td></td>
+					<td style="text-align: left"><code>{ff}</code></td>
+			</tr>
+			<tr>
+					<td style="text-align: left"><code>&quot;\xfe&quot;</code></td>
+					<td></td>
+					<td style="text-align: right">254 (or) -2</td>
+					<td></td>
+					<td style="text-align: right">254</td>
+					<td></td>
+					<td style="text-align: left"><code>{fe}</code></td>
+			</tr>
+	</tbody>
 </table>
 <p>So which of these solutions is best?</p>
 <p>In my opinion, solution (1) is the clear winner, since it more properly communicates <em>intent</em>.</p>
@@ -1024,10 +1221,20 @@ While there is some subtlety here in the actual definition, for our purposes, it
 </li>
 </ol>
 </div>
-</article>
 
-        </main><footer id="footer">
-    Copyright © 2026 Stephen Skeirik
+</content>
+
+
+
+<p>
+  
+</p>
+
+  </main>
+  <footer><p>Copyright &copy; 2022-2026 Stephen Skeirik</p>
 </footer>
+
+  
 </body>
+
 </html>
