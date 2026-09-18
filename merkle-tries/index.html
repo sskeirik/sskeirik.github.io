@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="https://srs.fyi/favicon/light/favicon-32x32.png" />
+<title>Merkle Tries | srs.fyi</title>
+<meta name="title" content="Merkle Tries" />
+<meta name="description" content="I recently took a take-home programming test with a potential employer.
+While no job offer materialized from the experience, since I enjoyed working through the problems so much, I decided to push myself further and see what kind of solution I could come up with, when no restrictions were imposed.
+The current blog post is my commentary on how I completed that exercise, but if you want, you can skip all of commentary and get straight to the dang code by clicking here." />
+<meta name="keywords" content="" />
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  :root {
+    --width: 720px;
+    --font-main: Verdana, sans-serif;
+    --font-secondary: Verdana, sans-serif;
+    --font-scale: 1em;
+    --background-color: #fff;
+    --heading-color: #222;
+    --text-color: #444;
+    --link-color: #3273dc;
+    --visited-color: #8b6fcb;
+    --blockquote-color: #222;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #01242e;
+      --heading-color: #eee;
+      --text-color: #ddd;
+      --link-color: #8cc2dd;
+      --visited-color: #8b6fcb;
+      --blockquote-color: #ccc;
+    }
+  }
+
+  body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-scale);
+    margin: auto;
+    padding: 20px;
+    max-width: var(--width);
+    text-align: left;
+    background-color: var(--background-color);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-main);
+    color: var(--heading-color);
+  }
+
+  a {
+    color: var(--link-color);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  nav a {
+    margin-right: 8px;
+  }
+
+  strong,
+  b {
+    color: var(--heading-color);
+  }
+
+  button {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  time {
+    font-family: monospace;
+    font-style: normal;
+    font-size: 15px;
+  }
+
+  main {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px dashed;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    font-family: monospace;
+    padding: 2px;
+    border-radius: 3px;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: var(--blockquote-color);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px 0;
+    text-align: center;
+  }
+
+  .title:hover {
+    text-decoration: none;
+  }
+
+  .title h1 {
+    font-size: 1.5em;
+  }
+
+  .inline {
+    width: auto !important;
+  }
+
+  .highlight,
+  .code {
+    border-radius: 3px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    overflow-x: auto;
+  }
+
+  .highlight pre,
+  .code pre {
+    min-width: 100%;
+    width: max-content;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: var(--visited-color);
+  }
+
+</style>
+
+<style>
+@media (prefers-color-scheme: light) {
+.bg{color:#272822;background-color:#fafafa}.chroma{color:#272822;background-color:#fafafa;-webkit-text-size-adjust:none}.chroma .err{color:#960050;background-color:#1e0010}.chroma .lnlinks{outline:none;text-decoration:none;color:inherit}.chroma .lntd{vertical-align:top;padding:0;margin:0;border:0}.chroma .lntable{border-spacing:0;padding:0;margin:0;border:0}.chroma .hl{background-color:#e1e1e1}.chroma .lnt{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .ln{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .line{display:flex}.chroma .k{color:#00a8c8}.chroma .kc{color:#00a8c8}.chroma .kd{color:#00a8c8}.chroma .kn{color:#f92672}.chroma .kp{color:#00a8c8}.chroma .kr{color:#00a8c8}.chroma .kt{color:#00a8c8}.chroma .n{color:#111}.chroma .na{color:#75af00}.chroma .nc{color:#75af00}.chroma .no{color:#00a8c8}.chroma .nd{color:#75af00}.chroma .ni{color:#111}.chroma .ne{color:#75af00}.chroma .nl{color:#111}.chroma .nn{color:#111}.chroma .nx{color:#75af00}.chroma .py{color:#111}.chroma .nt{color:#f92672}.chroma .nb{color:#111}.chroma .bp{color:#111}.chroma .nv{color:#111}.chroma .vc{color:#111}.chroma .vg{color:#111}.chroma .vi{color:#111}.chroma .vm{color:#111}.chroma .nf{color:#75af00}.chroma .fm{color:#75af00}.chroma .l{color:#ae81ff}.chroma .ld{color:#d88200}.chroma .s{color:#d88200}.chroma .sa{color:#d88200}.chroma .sb{color:#d88200}.chroma .sc{color:#d88200}.chroma .dl{color:#d88200}.chroma .sd{color:#d88200}.chroma .s2{color:#d88200}.chroma .se{color:#8045ff}.chroma .sh{color:#d88200}.chroma .si{color:#d88200}.chroma .sx{color:#d88200}.chroma .sr{color:#d88200}.chroma .s1{color:#d88200}.chroma .ss{color:#d88200}.chroma .m{color:#ae81ff}.chroma .mb{color:#ae81ff}.chroma .mf{color:#ae81ff}.chroma .mh{color:#ae81ff}.chroma .mi{color:#ae81ff}.chroma .il{color:#ae81ff}.chroma .mo{color:#ae81ff}.chroma .o{color:#f92672}.chroma .ow{color:#f92672}.chroma .or{color:#f92672}.chroma .p{color:#111}.chroma .c{color:#75715e}.chroma .ch{color:#75715e}.chroma .cm{color:#75715e}.chroma .c1{color:#75715e}.chroma .cs{color:#75715e}.chroma .cp{color:#75715e}.chroma .cpf{color:#75715e}.chroma .ge{font-style:italic}.chroma .gs{font-weight:700}
+}
+@media (prefers-color-scheme: dark) {
+.bg{color:#f8f8f2;background-color:#272822}.chroma{color:#f8f8f2;background-color:#272822;-webkit-text-size-adjust:none}.chroma .err{color:#960050;background-color:#1e0010}.chroma .lnlinks{outline:none;text-decoration:none;color:inherit}.chroma .lntd{vertical-align:top;padding:0;margin:0;border:0}.chroma .lntable{border-spacing:0;padding:0;margin:0;border:0}.chroma .hl{background-color:#3c3d38}.chroma .lnt{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .ln{white-space:pre;-webkit-user-select:none;user-select:none;margin-right:.4em;padding:0 .4em;color:#7f7f7f}.chroma .line{display:flex}.chroma .k{color:#66d9ef}.chroma .kc{color:#66d9ef}.chroma .kd{color:#66d9ef}.chroma .kn{color:#f92672}.chroma .kp{color:#66d9ef}.chroma .kr{color:#66d9ef}.chroma .kt{color:#66d9ef}.chroma .na{color:#a6e22e}.chroma .nc{color:#a6e22e}.chroma .no{color:#66d9ef}.chroma .nd{color:#a6e22e}.chroma .ne{color:#a6e22e}.chroma .nx{color:#a6e22e}.chroma .nt{color:#f92672}.chroma .nf{color:#a6e22e}.chroma .fm{color:#a6e22e}.chroma .l{color:#ae81ff}.chroma .ld{color:#e6db74}.chroma .s{color:#e6db74}.chroma .sa{color:#e6db74}.chroma .sb{color:#e6db74}.chroma .sc{color:#e6db74}.chroma .dl{color:#e6db74}.chroma .sd{color:#e6db74}.chroma .s2{color:#e6db74}.chroma .se{color:#ae81ff}.chroma .sh{color:#e6db74}.chroma .si{color:#e6db74}.chroma .sx{color:#e6db74}.chroma .sr{color:#e6db74}.chroma .s1{color:#e6db74}.chroma .ss{color:#e6db74}.chroma .m{color:#ae81ff}.chroma .mb{color:#ae81ff}.chroma .mf{color:#ae81ff}.chroma .mh{color:#ae81ff}.chroma .mi{color:#ae81ff}.chroma .il{color:#ae81ff}.chroma .mo{color:#ae81ff}.chroma .o{color:#f92672}.chroma .ow{color:#f92672}.chroma .or{color:#f92672}.chroma .p{color:#f8f8f2}.chroma .c{color:#75715e}.chroma .ch{color:#75715e}.chroma .cm{color:#75715e}.chroma .c1{color:#75715e}.chroma .cs{color:#75715e}.chroma .cp{color:#75715e}.chroma .cpf{color:#75715e}.chroma .gd{color:#f92672}.chroma .ge{font-style:italic}.chroma .gi{color:#a6e22e}.chroma .gs{font-weight:700}.chroma .gu{color:#75715e}
+}
+:root{--border-color:rgba(0, 0, 0, 0.15);--accent:#333;--row-alt:rgba(0, 0, 0, 0.03);--row-hover:rgba(0, 0, 0, 0.06)}@media(prefers-color-scheme:dark){:root{--border-color:rgba(255, 255, 255, 0.15);--accent:#e8e8e8;--row-alt:rgba(255, 255, 255, 0.04);--row-hover:rgba(255, 255, 255, 0.08)}}content table{width:100%;border-collapse:collapse;font-size:.95rem;margin:1.5rem 0}content th,content td{padding:.6rem 1rem;border-bottom:1px solid var(--border-color,#ddd);text-align:left}content thead th{border-bottom:2px solid var(--accent,#333);font-weight:600}content tbody tr:nth-child(even){background:var(--row-alt,rgba(0,0,0,2%))}content tbody tr:hover{background:var(--row-hover,rgba(0,0,0,5%))}content .table-wrapper{overflow-x:auto}.logo svg{height:auto;width:auto;display:block;aspect-ratio:1/1;height:2em}.header-row{display:flex;align-items:center;gap:1em}
+</style>
+
+<script>
+const setFavicon = () => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const favicon = document.querySelector('link[rel~="icon"]');
+  favicon.href = isDark ? 'https:\/\/srs.fyi\/favicon\/dark\/favicon-32x32.png' : 'https:\/\/srs.fyi\/favicon\/light\/favicon-32x32.png';
+};
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setFavicon);
+setFavicon();
+</script>
+
+
+
+
+</head>
+
+<body>
+  <header><div class="header-row">
+
+<a class="logo" href="/"> <!-- Generated by text-to-svg.com -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 2.490000009536743 62.650001525878906 54.19999694824219" data-asc="1.0087890625" width="62.650001525878906" height="54.19999694824219"><g fill="var(--text-color)"><g transform="translate(0, 0)"><path d="M13.16 56.69Q10.96 56.69 9.13 55.75Q7.30 54.81 6.19 52.73Q5.08 50.66 5.08 47.29L5.08 36.99Q5.08 34.06 4.10 32.97Q3.13 31.88 1.27 31.79L0 31.71L0 27.34L1.25 27.27Q3.10 27.15 4.08 26.07Q5.05 25 5.05 22.09L5.05 11.87Q5.05 8.50 6.16 6.43Q7.28 4.37 9.12 3.43Q10.96 2.49 13.16 2.49Q14.77 2.49 16.82 3.13L16.82 6.88L15.89 6.88Q12.89 6.88 11.72 7.62Q10.55 8.35 10.55 10.25L10.55 20.04Q10.55 23.63 9.73 25.90Q8.91 28.17 6.59 29.22L6.59 29.86Q8.84 30.91 9.69 33.18Q10.55 35.45 10.55 39.01L10.55 48.90Q10.55 50.81 11.72 51.55Q12.89 52.29 15.89 52.29L16.82 52.29L16.82 56.03Q14.79 56.69 13.16 56.69ZM21.48 41.99Q21.48 40.65 21.64 39.50Q21.80 38.35 22.12 37.06L27.03 37.06L27.03 38.92Q27.03 42.29 28.05 44.08Q29.08 45.87 31.20 45.87Q34.86 45.87 34.86 42.29Q34.86 40.89 34.27 39.36Q33.67 37.82 31.93 35.60L25.34 27.32Q23.61 25.07 22.64 22.83Q21.68 20.58 21.68 17.82Q21.68 13.67 24.26 11.02Q26.83 8.37 31.40 8.37Q35.08 8.37 37.18 9.70Q39.28 11.04 40.15 13.06Q41.02 15.09 41.02 17.21Q41.02 18.55 40.81 19.69Q40.60 20.83 40.33 22.19L35.45 22.19L35.45 20.19Q35.45 16.89 34.40 15.11Q33.35 13.33 31.40 13.33Q29.61 13.33 28.70 14.32Q27.78 15.31 27.78 16.97Q27.78 18.38 28.37 19.54Q28.96 20.70 29.86 21.92L37.21 31.25Q39.23 33.86 40.30 36.22Q41.36 38.57 41.36 41.46Q41.36 45.78 38.60 48.30Q35.84 50.83 31.25 50.83Q27.49 50.83 25.35 49.55Q23.22 48.27 22.35 46.24Q21.48 44.21 21.48 41.99ZM49.49 56.69Q47.85 56.69 45.83 56.03L45.83 52.29L46.75 52.29Q49.76 52.29 50.93 51.55Q52.10 50.81 52.10 48.90L52.10 39.01Q52.10 35.45 52.95 33.18Q53.81 30.91 56.03 29.86L56.03 29.22Q53.74 28.17 52.92 25.90Q52.10 23.63 52.10 20.04L52.10 10.25Q52.10 8.35 50.93 7.62Q49.76 6.88 46.75 6.88L45.83 6.88L45.83 3.13Q46.78 2.83 47.73 2.66Q48.68 2.49 49.49 2.49Q51.68 2.49 53.53 3.43Q55.37 4.37 56.48 6.43Q57.59 8.50 57.59 11.87L57.59 22.09Q57.59 25 58.57 26.07Q59.55 27.15 61.40 27.27L62.65 27.34L62.65 31.71L61.38 31.79Q59.52 31.88 58.54 32.97Q57.57 34.06 57.57 36.99L57.57 47.29Q57.57 50.66 56.47 52.73Q55.37 54.81 53.53 55.75Q51.68 56.69 49.49 56.69Z"/></g></g></svg>
+ </a>
+<nav>
+<a href="/">Home</a>
+
+<a href="/blog/">Blog</a>
+
+<a href="/about/">About</a>
+
+</nav>
+</div>
+</header>
+  <main>
+
+<h1>Merkle Tries</h1>
+<p>
+  <i>
+    <time datetime='2026-09-18'>
+      18 Sep, 2026
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>I recently took a take-home programming test with a potential employer.
+While no job offer materialized from the experience, since I enjoyed working through the problems so much, I decided to push myself further and see what kind of solution I could come up with, when no restrictions were imposed.</p>
+<p>The current blog post is my commentary on how I completed that exercise, but if you want, you can <a href="https://github.com/sskeirk/merkle-trie">skip all of commentary and get straight to the dang code by clicking here</a>.</p>
+<p>So what is this all about? The take-home test in question was split into a few separate parts, one of which was to develop a Merkle trie library, in Rust, from scratch (LLM assistance permitted). While I had used/seen a few trie libraries previously, I had never written one on my own. As I embarked on this new adventure, I found there were a couple different design decisions that I had to hold in tension. I&rsquo;ve listed a few of the more interesting ones below:</p>
+<ol>
+<li>How can we make APIs that are efficient and respect Rust&rsquo;s owernship discipline?</li>
+<li>How can we write that safely and generically handles operations over Merkle tries as well as their witnesses?</li>
+<li>Should we optimize for dense tries or sparse tries?</li>
+</ol>
+<p>In the remainder of this post, I&rsquo;ll tackle each of these questions in turn.</p>
+<p>NB: Since a trie is a kind of tree, I prefer to use term &rsquo;tree&rsquo; to talk about considerations that apply to <em>all</em> trees and &rsquo;trie&rsquo; for trie-specific issues.</p>
+<hr>
+<p>Interestingly, I found that the first two questions required more careful thinking than the last one, so let&rsquo;s start with it:</p>
+<blockquote>
+<ol start="3">
+<li>Should we optimize for dense tries or sparse tries?</li>
+</ol>
+</blockquote>
+<p>In my estimation, the above question is basically the same as the following question: should we optimize for a higher or lower branching factor?
+To see why, first note that:</p>
+<ul>
+<li>a higher branching factor makes trees shallower and tree traversal cheaper, but makes each node larger, increasing memory use;</li>
+<li>a lower branching factor makes trees deeper and tree traversal more expensive, but each node is smaller, saving memory.</li>
+</ul>
+<p>Now, for sparse trees, we know most branches will be empty.
+This implies, probabilistically, that the tree will be shallower.
+This means that, even with a lower branching factor, our tree will likely not grow too large.
+Altogether, this means that a low branching factor gives us free memory and and likely better memory locality, as more nodes can fit in any given cahce level, page, etc&hellip;</p>
+<p>For dense trees, the opposite is true: most branches will be full.
+In that case, a lower branching factor will cause the tree depth to balloon, leading to redundant allocations (e.g. a single complete 4-ary node is equivalent to three complete binary nodes) and pointer chasing.
+Altogether, this means that a higher branch factor saves us time and also will likely <em>save</em> memory because branch node metadata can be shared amongst multiple child nodes.</p>
+<p>In any event, I punted on figuring out if some branching factor is better <em>in general</em> (whatever that would mean) and used generics to let the user pick from a few different branching factors (either 2, 4, 16, or 256).
+The decision was made to restrict to powers of two, since:</p>
+<ul>
+<li>Natural numbers modulo <em>K</em> for these choices of <em>K</em> require exactly 1, 2, 4, or 8 bits, and so, all fit within one byte and evenly partition it (with 8, 4, 2, and 1 integers respectively).</li>
+<li>This means, for each trie key viewed as a byte string, each bit chunk of log(<em>K</em>)-bits corresponds to a potential branch in the trie structure, and&hellip;</li>
+<li>Checking which branch child that a target key maps to in the trie structure only ever requires examining one byte of the target key.</li>
+</ul>
+<p>Put altogether, this means a child node lookup from a parent branch node equates to exactly the following four steps:</p>
+<ol>
+<li>Grab the appropriate selector byte from the target key;</li>
+<li>Apply a branch-stored bitmask to the selector byte to remove all bits that don&rsquo;t correspond to the current branch node&rsquo;s child nodes;</li>
+<li>Downshift the masked byte to remove all trailing zeroes;</li>
+<li>Use the resulting 1-byte number as an index into the child node array.</li>
+</ol>
+<hr>
+<p>Now, let&rsquo;s come back to the first question:</p>
+<blockquote>
+<ol>
+<li>How can we make APIs that are efficient and respect Rust&rsquo;s owernship discipline?</li>
+</ol>
+</blockquote>
+<p>Originally, to answer this question, I looked to the <code>std::collections</code> <code>BTreeMap</code> and <code>HashMap</code> entry-style APIs.
+These APIs are nice in that they essentially return a wrapped pointer to a map&rsquo;s key-value pair.
+This pointer lets you perform all of the operations you want <em>at once</em>.</p>
+<p>This API can optimize common cases where, for example, you need to set the value of a key <em>only if it hasn&rsquo;t been set before</em>. With a standard map API, you need to split this operation into two parts:</p>
+<ol>
+<li>Check if the key is in the map (requires either O(log(N)) or amortized O(1), depending on the implementation);</li>
+<li>If the key isn&rsquo;t in the map, insert it (requires <em>another</em> O(log(N)) or amortized O(1)).</li>
+</ol>
+<p>The key point (pun intended) is that, in the base case, the map structure has to be examined twice, identically, to perform this operation when, clearly, only one map traversal is actually required which just needs to return a pointer to where the key should be inserted. From this information alone, the key&rsquo;s presence in the map can be checked and a new value can be inserted, if required.</p>
+<p>However, the standard entry-style APIs require non-trivial work to be transferred to merkleized data structures for a simple reason: mutation in a merkleized data structure is inherently non-local!
+In particular, any mutation at some node <em>N</em> invalidates any cached node digests for <em>all</em> of <em>N</em>&rsquo;s ancestor nodes; this leaves two options:</p>
+<ol>
+<li>make tree mutations and ancestor digest updates <em>atomic</em>;</li>
+<li>make ancestor digest updates lazy.</li>
+</ol>
+<p>In approach (1), an API similar to the entry-style API can be supported&mdash;but it requires an inversion of control flow. Instead of returning a wrapped pointer entry-object, the update method must take an <em>updater</em> object (basically, a closure) which contains all logic needed to update the map. It then invokes the closure to update the map locally and walks back up the map structure to ensure that all ancestor node hashes are recalculated.</p>
+<p>In approach (2), the entry API can be directly supported. However, the cost is that all cached ancestor node digests must be invalidated. Then, when a digest is requested, the digest function checks whether the current node&rsquo;s cached digest has been invalidated. If so, it walks down the trie structure and back up, looking for invalided child node digests, recalculating them, and then recalculating their ancestors&rsquo; digests.</p>
+<p>In this implementation, I chose approach (1). My reasoning was two-fold:</p>
+<ul>
+<li>Firstly, I claim this approach is more efficient, as no search for invalidated digests needs be performed;</li>
+<li>Secondly, I found that, in most cases of the entry-style API, the returned entry object was used immediately (e.g., <code>map.entry(key).or_insert(val)</code>) and, in those cases, it is semantically equivalent to invert control flow with an updater closure.</li>
+</ul>
+<p>In actuality, the updater object is not a closure, but a trait, to avoid wasted memory; see the code for full details.</p>
+<hr>
+<p>Finally, we&rsquo;ll tackle the second question:</p>
+<blockquote>
+<ol start="2">
+<li>How can we write that safely and generically handles operations over Merkle tries as well as their witnesses?</li>
+</ol>
+</blockquote>
+<p>This one was a bit tricky because I wanted two things that were at odds:</p>
+<ol>
+<li>(essentially) the same API and same code for both complete Merkle tries and partial Merkle tries (that is, witnesses);</li>
+<li>a way to programmatically forbid a Merkle trie desiginated as &ldquo;complete&rdquo; to contain pruned sub-tries.</li>
+</ol>
+<p>Point (2) prevents stupid logic errors and allows a clean separation of concerns that immediately gives the following safety property: when working with a complete trie, the entire structure is available and all opertions are total.</p>
+<p>To accomplish this, I did the following:</p>
+<ol>
+<li>Used an extra generic trait parameter on my <code>Trie</code> struct that attached to potentially pruned nodes;</li>
+<li>Instantiated this trait parameter with either the unit type (a.k.a. the 0-tuple <code>()</code> in Rust) or the <code>std::convert::Infallible</code> type, i.e., an alias for the empty type (called <em>never</em> in Rust parlance and written <code>!</code>).</li>
+</ol>
+<p>In complete mode, the trait parameter is the empty type, which implies that pruned nodes cannot be constructed (as no valid term has this type).</p>
+<p>The one last trick is that: since both the unit and empty types are zero-sized types with identical alignment, if we are careful, we can safely bitcast from a &ldquo;complete&rdquo; trie to a &ldquo;partial&rdquo; trie, as every &ldquo;complete&rdquo; trie is a &ldquo;partial&rdquo; trie where no nodes have been pruned yet.</p>
+<hr>
+<p>Aside from these main questions, before closing this post out, I&rsquo;ll detail one other issue that I encountered.</p>
+<p>The issue: how to best <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a> my code (does anyone use this as a verb?).</p>
+<p>In particular, Rust&rsquo;s standout feature, the borrow checker which tracks mutable (<code>&amp;mut T</code>) and immutable (<code>&amp;T</code>) reference type usage, can sometimes fight <em>against</em> DRY.
+This can happen due when some bit of functionality <code>f</code> is generic over reference mutability, but some other functions <code>use_mut</code> and <code>use</code> <em>both</em> want to use <code>f</code> in different mutability contexts.</p>
+<p>A very good example of this data structure traversal: whether one is reading or updating a key in a tree, one will first need to traverse the tree to find the appropriate node.
+If we had something like built-in mutability-generics, then tree traversal could be written as a single function that:</p>
+<ul>
+<li>if given a mutable tree reference, returns an optional mutable node reference;</li>
+<li>if given a immutable tree reference, returns an optional immutable node reference.</li>
+</ul>
+<p>However, as far as I can tell, there is:</p>
+<ol>
+<li>no way to write this directly;</li>
+<li>no canonical trait that can capture this pattern.</li>
+</ol>
+<p>As I was building this merkle trie library, for the specific example above, i.e. tree traversal, I eventually gave up and just duplicated the code (for mutable/immutable cases respesctively).</p>
+<p>For a deeper discussion of this implementation detail and others, see the <a href="https://github.com/sskeirik/merkle-trie#details">implementation details</a> section of the library README.</p>
+<hr>
+<p>In addition to being an interesting problem in its own right, this was also my most long-running experiment to-date in using LLMs for code assistance.</p>
+<p>This came naturally: on the initial take-home test, their use was encouraged and, furthermore, the development of a merkle trie library was merely a building block to be used in a later test question.</p>
+<p>When I decided to continue the project on my own, I also decided I would continue my LLM experimentation (but in a more relaxed sort of way) as I no longer had any time constraints.</p>
+<p>This post is too long to have a complete discussion of my thoughts on LLMs, but I hope to return to this topic in a future post.</p>
+<p>Finally, if you&rsquo;ve made it this far, I hope you found the above discussion interesting!
+As always, the code is freely available, and you can read more and/or use it for yourself by visiting <a href="https://github.com/sskeirik/merkle-trie">https://github.com/sskeirik/merkle-trie</a>.</p>
+
+</content>
+
+
+
+<p>
+  
+</p>
+
+  </main>
+  <footer><p>Copyright &copy; 2022-2026 Stephen Skeirik</p>
+</footer>
+
+  
+</body>
+
+</html>

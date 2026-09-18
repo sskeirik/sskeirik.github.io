@@ -12,9 +12,16 @@
 			<copyright>Copyright © 2026, Stephen Skeirik.</copyright>
 		
 		
-			<lastBuildDate>Thu, 19 Feb 2026 22:57:00 -0400</lastBuildDate>
+			<lastBuildDate>Fri, 18 Sep 2026 13:10:00 -0400</lastBuildDate>
 		
 			<atom:link href="https://srs.fyi/blog/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>Merkle Tries</title>
+				<link>https://srs.fyi/merkle-tries/</link>
+				<pubDate>Fri, 18 Sep 2026 13:10:00 -0400</pubDate>
+				<guid>https://srs.fyi/merkle-tries/</guid>
+				<description>&lt;p&gt;I recently took a take-home programming test with a potential employer.&#xA;While no job offer materialized from the experience, since I enjoyed working through the problems so much, I decided to push myself further and see what kind of solution I could come up with, when no restrictions were imposed.&lt;/p&gt;&#xA;&lt;p&gt;The current blog post is my commentary on how I completed that exercise, but if you want, you can &lt;a href=&#34;https://github.com/sskeirk/merkle-trie&#34;&gt;skip all of commentary and get straight to the dang code by clicking here&lt;/a&gt;.&lt;/p&gt;</description>
+			</item>
 			<item>
 				<title>See Conversions</title>
 				<link>https://srs.fyi/see-conversions/</link>
